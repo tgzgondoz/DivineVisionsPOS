@@ -100,18 +100,7 @@ const AppNavigator = ({ onLogout }) => {
         initialParams={{ screenName: 'Inventory Dashboard' }}
       />
       
-      {/* Admin Panel - Only Admin */}
-      {isAdmin() && (
-        <Tab.Screen 
-          name="Admin" 
-          component={AdminDashboardScreen}
-          options={{ 
-            title: 'Admin Panel',
-            headerShown: true,
-          }}
-          initialParams={{ user, onLogout }}
-        />
-      )}
+      
     </Tab.Navigator>
   );
 };
