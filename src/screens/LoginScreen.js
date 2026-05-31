@@ -14,7 +14,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthService from '../services/AuthService';
 
-const LoginScreen = ({ navigation, onLogin }) => {
+const LoginScreen = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,8 +33,18 @@ const LoginScreen = ({ navigation, onLogin }) => {
     setLoading(true);
     try {
       const result = await AuthService.loginUser(email, password);
-      if (result.success) {
-        onLogin(result.user);
+      if (result.success && result.user) {
+        // Ensure user object has all required fields
+        const userData = {
+          id: result.user.id,
+          email: result.user.email,
+          fullName: result.user.fullName,
+          role: result.user.role,
+          isActive: result.user.isActive
+        };
+        onLogin(userData);
+      } else {
+        Alert.alert('Login Failed', 'Invalid credentials');
       }
     } catch (error) {
       Alert.alert('Login Failed', error.message);

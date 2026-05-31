@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -91,12 +92,13 @@ const MainApp = () => {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-        <AppNavigator />
-        {/* Add logout button in header or via a menu */}
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+          <AppNavigator onLogout={handleLogout} />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </NavigationContainer>
   );
 };
 

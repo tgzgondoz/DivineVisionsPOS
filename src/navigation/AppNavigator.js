@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,7 +13,7 @@ import AdminDashboardScreen from '../screens/AdminDashboardScreen';
 
 const Tab = createBottomTabNavigator();
 
-const AppNavigator = () => {
+const AppNavigator = ({ onLogout }) => {
   const { isAdmin } = useAuth();
 
   return (
@@ -43,6 +43,14 @@ const AppNavigator = () => {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerRight: () => (
+          <TouchableOpacity 
+            onPress={onLogout} 
+            style={{ marginRight: 16 }}
+          >
+            <Icon name="log-out" size={24} color="#fff" />
+          </TouchableOpacity>
+        ),
       })}
     >
       <Tab.Screen 
@@ -83,7 +91,15 @@ const AppNavigator = () => {
           component={AdminDashboardScreen}
           options={{ 
             title: 'Admin Panel',
-            headerShown: false 
+            headerShown: true,
+            headerRight: () => (
+              <TouchableOpacity 
+                onPress={onLogout} 
+                style={{ marginRight: 16 }}
+              >
+                <Icon name="log-out" size={24} color="#fff" />
+              </TouchableOpacity>
+            ),
           }}
         />
       )}

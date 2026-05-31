@@ -1,4 +1,7 @@
-import { getDatabaseInstance, ref, set, push, onValue, update, get } from '../config/firebase';
+import { getDatabaseInstance, ref, set, push, onValue, update, remove } from '../config/firebase';
+
+// Simple in-memory session storage
+let currentSessionUser = null;
 
 class AuthService {
   static async registerUser(email, password, fullName, role) {
@@ -8,11 +11,14 @@ class AuthService {
       
       // Check if user already exists
       let userExists = false;
+      let usersList = [];
+      
       await new Promise((resolve) => {
         onValue(usersRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            userExists = Object.values(data).some(user => user.email === email);
+            usersList = Object.values(data);
+            userExists = usersList.some(user => user.email === email);
           }
           resolve();
         }, { onlyOnce: true });
@@ -65,6 +71,10 @@ class AuthService {
         // Update last login
         const userRef = ref(db, `users/${user.id}`);
         await update(userRef, { lastLogin: new Date().toISOString() });
+        
+        // Store in memory session
+        currentSessionUser = user;
+        
         return { success: true, user };
       } else if (user && !user.isActive) {
         throw new Error('Account is deactivated');
@@ -75,6 +85,10 @@ class AuthService {
       console.error('Error logging in:', error);
       throw error;
     }
+  }
+  
+  static getCurrentSessionUser() {
+    return currentSessionUser;
   }
   
   static async getUsers() {
@@ -132,7 +146,7 @@ class AuthService {
   }
   
   static logout() {
-    // Clear any stored session data
+    currentSessionUser = null;
     return true;
   }
 }

@@ -1,39 +1,48 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AuthService from '../services/AuthService';
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadStoredUser();
+    // Check for existing session
+    const checkSession = async () => {
+      try {
+        const currentUser = AuthService.getCurrentSessionUser();
+        if (currentUser && currentUser.id) {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkSession();
   }, []);
 
-  const loadStoredUser = async () => {
-    try {
-      const storedUser = await AsyncStorage.getItem('pos_user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Error loading user:', error);
-    } finally {
-      setLoading(false);
+  const login = (userData) => {
+    if (userData && userData.id) {
+      setUser(userData);
+    } else {
+      console.error('Invalid user data:', userData);
     }
   };
 
-  const login = async (userData) => {
-    setUser(userData);
-    await AsyncStorage.setItem('pos_user', JSON.stringify(userData));
-  };
-
   const logout = async () => {
+    await AuthService.logout();
     setUser(null);
-    await AsyncStorage.removeItem('pos_user');
   };
 
   const isAdmin = () => {
