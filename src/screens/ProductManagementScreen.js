@@ -365,7 +365,7 @@ const ProductManagementScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
      
-      {/* Stats Cards */}
+      {/* Stats Cards - Smaller */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
         <View style={styles.statsScrollContent}>
           <View style={styles.statCard}>
@@ -374,15 +374,15 @@ const ProductManagementScreen = () => {
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{formatCurrency(stats.totalInventoryValue)}</Text>
-            <Text style={styles.statLabel}>Inventory Value</Text>
+            <Text style={styles.statLabel}>Inventory</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{formatCurrency(stats.totalPotentialRevenue)}</Text>
-            <Text style={styles.statLabel}>Revenue Potential</Text>
+            <Text style={styles.statLabel}>Revenue</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{formatCurrency(stats.totalPotentialProfit)}</Text>
-            <Text style={styles.statLabel}>Profit Potential</Text>
+            <Text style={styles.statLabel}>Profit</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
@@ -390,7 +390,7 @@ const ProductManagementScreen = () => {
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statValue, styles.dangerText]}>{stats.outOfStockCount}</Text>
-            <Text style={styles.statLabel}>Out of Stock</Text>
+            <Text style={styles.statLabel}>Out Stock</Text>
           </View>
         </View>
       </ScrollView>
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
   },
   statsScroll: {
     backgroundColor: '#fff',
-    paddingVertical: 14,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -664,23 +664,23 @@ const styles = StyleSheet.create({
   },
   statCard: {
     backgroundColor: '#fff',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    minWidth: 110,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginHorizontal: 4,
+    minWidth: 80,
     alignItems: 'center',
-    elevation: 2,
+    elevation: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowRadius: 1,
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fec82b',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   warningText: {
     color: '#ff8800',
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     color: '#ff4444',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#666',
     fontWeight: '500',
   },
