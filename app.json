@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DivineVisionsPOS",
-    "slug": "DivineVisionsPOS",
+    "name": "DevineVisionsPOS",
+    "slug": "DevineVisionsPOS",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,10 +15,16 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "package": "com.tatenda_gondo.DevineVisionsPOS"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "02c58c44-9886-4bef-a07d-c0922db31baa"
+      }
     }
   }
 }
