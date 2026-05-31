@@ -10,6 +10,7 @@ import ProductManagementScreen from '../screens/ProductManagementScreen';
 import SalesHistoryScreen from '../screens/SalesHistoryScreen';
 import InventoryScreen from '../screens/InventoryScreen';
 import AdminDashboardScreen from '../screens/AdminDashboardScreen';
+import CategoryManagementScreen from '../screens/CategoryManagementScreen';
 import RestrictedScreen from '../screens/RestrictedScreen';
 
 const Tab = createBottomTabNavigator();
@@ -36,6 +37,8 @@ const AppNavigator = ({ onLogout }) => {
             iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Admin') {
             iconName = focused ? 'shield' : 'shield-outline';
+          } else if (route.name === 'Categories') {
+            iconName = focused ? 'folder' : 'folder-outline';
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
@@ -79,6 +82,17 @@ const AppNavigator = ({ onLogout }) => {
         initialParams={{ screenName: 'Product Management' }}
       />
       
+      {/* Categories - Only Admin */}
+      <Tab.Screen 
+        name="Categories" 
+        component={isAdmin() ? CategoryManagementScreen : RestrictedScreen}
+        options={{ 
+          title: 'Category Management',
+          headerShown: true 
+        }}
+        initialParams={{ screenName: 'Category Management' }}
+      />
+      
       {/* Sales - Both roles can access */}
       <Tab.Screen 
         name="Sales" 
@@ -100,7 +114,16 @@ const AppNavigator = ({ onLogout }) => {
         initialParams={{ screenName: 'Inventory Dashboard' }}
       />
       
-      
+      {/* Admin Dashboard - Only Admin */}
+      <Tab.Screen 
+        name="Admin" 
+        component={isAdmin() ? AdminDashboardScreen : RestrictedScreen}
+        options={{ 
+          title: 'Admin Dashboard',
+          headerShown: true 
+        }}
+        initialParams={{ screenName: 'Admin Dashboard' }}
+      />
     </Tab.Navigator>
   );
 };

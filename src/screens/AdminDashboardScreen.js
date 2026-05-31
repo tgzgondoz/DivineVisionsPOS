@@ -9,7 +9,8 @@ import {
   Modal,
   TextInput,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthService from '../services/AuthService';
@@ -219,125 +220,129 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Admin Dashboard</Text>
-        <TouchableOpacity onPress={onLogout} style={styles.logoutBtn}>
-          <Icon name="log-out" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header removed as requested */}
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{stats.totalUsers}</Text>
-          <Text style={styles.statLabel}>Total Users</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.adminStat]}>{stats.admins}</Text>
-          <Text style={styles.statLabel}>Admins</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.cashierStat]}>{stats.cashiers}</Text>
-          <Text style={styles.statLabel}>Cashiers</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.activeStat]}>{stats.activeUsers}</Text>
-          <Text style={styles.statLabel}>Active</Text>
-        </View>
-      </View>
-
-      <View style={styles.listHeader}>
-        <Text style={styles.listTitle}>User Management</Text>
-        <TouchableOpacity style={styles.addUserBtn} onPress={() => setModalVisible(true)}>
-          <Icon name="add" size={24} color="#007AFF" />
-          <Text style={styles.addUserText}>Add User</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={users}
-        renderItem={renderUserItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No users found</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats.totalUsers}</Text>
+            <Text style={styles.statLabel}>Total Users</Text>
           </View>
-        }
-      />
-
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add New User</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Icon name="close" size={24} color="#333" />
-            </TouchableOpacity>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, styles.adminStat]}>{stats.admins}</Text>
+            <Text style={styles.statLabel}>Admins</Text>
           </View>
-          
-          <ScrollView style={styles.modalForm}>
-            <Text style={styles.label}>Full Name *</Text>
-            <TextInput
-              style={styles.input}
-              value={newUser.fullName}
-              onChangeText={(text) => setNewUser({ ...newUser, fullName: text })}
-              placeholder="Enter full name"
-            />
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, styles.cashierStat]}>{stats.cashiers}</Text>
+            <Text style={styles.statLabel}>Cashiers</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, styles.activeStat]}>{stats.activeUsers}</Text>
+            <Text style={styles.statLabel}>Active</Text>
+          </View>
+        </View>
 
-            <Text style={styles.label}>Email *</Text>
-            <TextInput
-              style={styles.input}
-              value={newUser.email}
-              onChangeText={(text) => setNewUser({ ...newUser, email: text })}
-              placeholder="Enter email"
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
+        <View style={styles.listHeader}>
+          <Text style={styles.listTitle}>User Management</Text>
+          <TouchableOpacity style={styles.addUserBtn} onPress={() => setModalVisible(true)}>
+            <Icon name="add" size={24} color="#007AFF" />
+            <Text style={styles.addUserText}>Add User</Text>
+          </TouchableOpacity>
+        </View>
 
-            <Text style={styles.label}>Password *</Text>
-            <TextInput
-              style={styles.input}
-              value={newUser.password}
-              onChangeText={(text) => setNewUser({ ...newUser, password: text })}
-              placeholder="Enter password"
-              secureTextEntry
-            />
-
-            <Text style={styles.label}>Role *</Text>
-            <View style={styles.roleSelector}>
-              <TouchableOpacity
-                style={[styles.roleOption, newUser.role === 'admin' && styles.roleOptionActive]}
-                onPress={() => setNewUser({ ...newUser, role: 'admin' })}
-              >
-                <Text style={[styles.roleOptionText, newUser.role === 'admin' && styles.roleOptionTextActive]}>
-                  Admin
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.roleOption, newUser.role === 'cashier' && styles.roleOptionActive]}
-                onPress={() => setNewUser({ ...newUser, role: 'cashier' })}
-              >
-                <Text style={[styles.roleOptionText, newUser.role === 'cashier' && styles.roleOptionTextActive]}>
-                  Cashier
-                </Text>
-              </TouchableOpacity>
+        <FlatList
+          data={users}
+          renderItem={renderUserItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No users found</Text>
             </View>
+          }
+          showsVerticalScrollIndicator={false}
+        />
 
-            <TouchableOpacity style={styles.submitBtn} onPress={handleAddUser}>
-              <Text style={styles.submitBtnText}>Add User</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </Modal>
-    </View>
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <SafeAreaView style={styles.safeArea}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Add New User</Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Icon name="close" size={24} color="#333" />
+                </TouchableOpacity>
+              </View>
+              
+              <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
+                <Text style={styles.label}>Full Name *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={newUser.fullName}
+                  onChangeText={(text) => setNewUser({ ...newUser, fullName: text })}
+                  placeholder="Enter full name"
+                />
+
+                <Text style={styles.label}>Email *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={newUser.email}
+                  onChangeText={(text) => setNewUser({ ...newUser, email: text })}
+                  placeholder="Enter email"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+
+                <Text style={styles.label}>Password *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={newUser.password}
+                  onChangeText={(text) => setNewUser({ ...newUser, password: text })}
+                  placeholder="Enter password"
+                  secureTextEntry
+                />
+
+                <Text style={styles.label}>Role *</Text>
+                <View style={styles.roleSelector}>
+                  <TouchableOpacity
+                    style={[styles.roleOption, newUser.role === 'admin' && styles.roleOptionActive]}
+                    onPress={() => setNewUser({ ...newUser, role: 'admin' })}
+                  >
+                    <Text style={[styles.roleOptionText, newUser.role === 'admin' && styles.roleOptionTextActive]}>
+                      Admin
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.roleOption, newUser.role === 'cashier' && styles.roleOptionActive]}
+                    onPress={() => setNewUser({ ...newUser, role: 'cashier' })}
+                  >
+                    <Text style={[styles.roleOptionText, newUser.role === 'cashier' && styles.roleOptionTextActive]}>
+                      Cashier
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.submitBtn} onPress={handleAddUser}>
+                  <Text style={styles.submitBtnText}>Add User</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </SafeAreaView>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -346,22 +351,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  header: {
-    backgroundColor: '#007AFF',
-    padding: 16,
-    paddingTop: 40,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  logoutBtn: {
-    padding: 8,
+    backgroundColor: '#f5f5f5',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -370,6 +360,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   statCard: {
     flex: 1,
@@ -417,6 +411,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 16,
+    paddingTop: 0,
   },
   userCard: {
     backgroundColor: '#fff',
@@ -424,6 +419,10 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   userInfo: {
     flexDirection: 'row',
@@ -530,12 +529,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#f5f5f5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#333',
   },
   modalForm: {
     padding: 16,

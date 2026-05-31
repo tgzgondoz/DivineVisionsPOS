@@ -15,21 +15,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { getDatabaseInstance, ref, onValue, update, push, set, remove } from '../config/firebase';
 
-const categories = [
-  'Electronics',
-  'Clothing',
-  'Food & Beverage',
-  'Furniture',
-  'Tools',
-  'Accessories',
-  'Beauty',
-  'Health',
-  'Sports',
-  'Toys',
-  'Books',
-  'Other'
-];
-
 const ProductManagementScreen = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -39,13 +24,15 @@ const ProductManagementScreen = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedSort, setSelectedSort] = useState('name'); // name, price, stock, date
+  const [selectedSort, setSelectedSort] = useState('name');
   const [showFilters, setShowFilters] = useState(false);
+  const [categories, setCategories] = useState(['Other']);
+  const [customCategory, setCustomCategory] = useState('');
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    cost: '',
     category: '',
     quantity: '',
     description: '',
@@ -55,6 +42,7 @@ const ProductManagementScreen = () => {
 
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
 
   useEffect(() => {
@@ -76,10 +64,23 @@ const ProductManagementScreen = () => {
     });
   };
 
+  const loadCategories = () => {
+    const db = getDatabaseInstance();
+    const categoriesRef = ref(db, 'categories');
+    onValue(categoriesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const categoriesList = Object.keys(data).map(key => data[key].name);
+        setCategories(['Other', ...categoriesList]);
+      } else {
+        setCategories(['Other']);
+      }
+    });
+  };
+
   const filterAndSortProducts = () => {
     let filtered = [...products];
     
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(product => 
         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -88,16 +89,14 @@ const ProductManagementScreen = () => {
       );
     }
     
-    // Apply category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
     
-    // Apply sorting
     filtered.sort((a, b) => {
       switch(selectedSort) {
         case 'name':
-          return a.name.localeCompare(b.name);
+          return a.name?.localeCompare(b.name || '') || 0;
         case 'price':
           return (b.price || 0) - (a.price || 0);
         case 'stock':
@@ -116,17 +115,22 @@ const ProductManagementScreen = () => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const calculateProfit = () => {
-    const price = parseFloat(formData.price) || 0;
-    const cost = parseFloat(formData.cost) || 0;
-    return (price - cost).toFixed(2);
+  const handleCategorySelect = (category) => {
+    if (category === 'Other') {
+      setShowCustomCategory(true);
+      setFormData({ ...formData, category: '' });
+    } else {
+      setShowCustomCategory(false);
+      setFormData({ ...formData, category: category });
+    }
   };
 
-  const calculateMargin = () => {
-    const price = parseFloat(formData.price) || 0;
-    const cost = parseFloat(formData.cost) || 0;
-    if (price === 0) return '0%';
-    return `${((price - cost) / price * 100).toFixed(1)}%`;
+  const handleCustomCategorySubmit = () => {
+    if (customCategory.trim()) {
+      setFormData({ ...formData, category: customCategory.trim() });
+      setShowCustomCategory(false);
+      setCustomCategory('');
+    }
   };
 
   const validateForm = () => {
@@ -138,16 +142,8 @@ const ProductManagementScreen = () => {
       Alert.alert('Validation Error', 'Please enter a valid price');
       return false;
     }
-    if (!formData.cost || parseFloat(formData.cost) <= 0) {
-      Alert.alert('Validation Error', 'Please enter a valid cost');
-      return false;
-    }
-    if (parseFloat(formData.cost) > parseFloat(formData.price)) {
-      Alert.alert('Validation Error', 'Cost cannot be higher than price');
-      return false;
-    }
     if (!formData.category) {
-      Alert.alert('Validation Error', 'Please select a category');
+      Alert.alert('Validation Error', 'Please select or enter a category');
       return false;
     }
     return true;
@@ -162,22 +158,19 @@ const ProductManagementScreen = () => {
       const productData = {
         name: formData.name.trim(),
         price: parseFloat(formData.price),
-        cost: parseFloat(formData.cost),
         category: formData.category,
         quantity: parseInt(formData.quantity) || 0,
-        description: formData.description.trim(),
-        sku: formData.sku.trim(),
-        supplier: formData.supplier.trim(),
+        description: formData.description?.trim() || '',
+        sku: formData.sku?.trim() || '',
+        supplier: formData.supplier?.trim() || '',
         updatedAt: new Date().toISOString()
       };
 
       if (editingProduct) {
-        // Update existing product
         const productRef = ref(db, `products/${editingProduct.id}`);
         await update(productRef, productData);
         Alert.alert('Success', 'Product updated successfully');
       } else {
-        // Add new product
         const productsRef = ref(db, 'products');
         const newProductRef = push(productsRef);
         await set(newProductRef, {
@@ -227,15 +220,16 @@ const ProductManagementScreen = () => {
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
-      name: product.name,
-      price: product.price?.toString(),
-      cost: product.cost?.toString(),
-      category: product.category,
-      quantity: product.quantity?.toString(),
+      name: product.name || '',
+      price: product.price?.toString() || '',
+      category: product.category || '',
+      quantity: product.quantity?.toString() || '',
       description: product.description || '',
       sku: product.sku || '',
       supplier: product.supplier || ''
     });
+    setShowCustomCategory(false);
+    setCustomCategory('');
     setModalVisible(true);
   };
 
@@ -277,13 +271,14 @@ const ProductManagementScreen = () => {
     setFormData({
       name: '',
       price: '',
-      cost: '',
       category: '',
       quantity: '',
       description: '',
       sku: '',
       supplier: ''
     });
+    setShowCustomCategory(false);
+    setCustomCategory('');
   };
 
   const getStockStatus = (quantity) => {
@@ -299,8 +294,6 @@ const ProductManagementScreen = () => {
 
   const renderProduct = ({ item }) => {
     const stockStatus = getStockStatus(item.quantity);
-    const profit = (item.price || 0) - (item.cost || 0);
-    const margin = item.price ? (profit / item.price * 100).toFixed(1) : 0;
     
     return (
       <View style={styles.productCard}>
@@ -321,20 +314,17 @@ const ProductManagementScreen = () => {
           <View style={styles.priceSection}>
             <Text style={styles.priceLabel}>Price</Text>
             <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
-            <Text style={styles.costLabel}>Cost: {formatCurrency(item.cost)}</Text>
-          </View>
-          
-          <View style={styles.profitSection}>
-            <Text style={styles.profitLabel}>Profit</Text>
-            <Text style={styles.productProfit}>{formatCurrency(profit)}</Text>
-            <Text style={styles.marginLabel}>Margin: {margin}%</Text>
           </View>
           
           <View style={styles.stockSection}>
             <Text style={styles.stockLabel}>Stock</Text>
             <Text style={styles.productStock}>{item.quantity || 0} units</Text>
+          </View>
+          
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryLabel}>Category</Text>
             <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{item.category}</Text>
+              <Text style={styles.categoryText}>{item.category || 'Uncategorized'}</Text>
             </View>
           </View>
         </View>
@@ -370,12 +360,11 @@ const ProductManagementScreen = () => {
 
   const getTotalStats = () => {
     const totalProducts = products.length;
-    const totalValue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.cost || 0)), 0);
-    const totalPotentialRevenue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
+    const totalInventoryValue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
     const lowStockCount = products.filter(p => p.quantity < 10 && p.quantity > 0).length;
     const outOfStockCount = products.filter(p => p.quantity === 0).length;
     
-    return { totalProducts, totalValue, totalPotentialRevenue, lowStockCount, outOfStockCount };
+    return { totalProducts, totalInventoryValue, lowStockCount, outOfStockCount };
   };
 
   const stats = getTotalStats();
@@ -392,7 +381,6 @@ const ProductManagementScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Product Management</Text>
         <TouchableOpacity
@@ -406,19 +394,14 @@ const ProductManagementScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
         <View style={styles.statCard}>
           <Text style={styles.statValue}>{stats.totalProducts}</Text>
           <Text style={styles.statLabel}>Total Products</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatCurrency(stats.totalValue)}</Text>
+          <Text style={styles.statValue}>{formatCurrency(stats.totalInventoryValue)}</Text>
           <Text style={styles.statLabel}>Inventory Value</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatCurrency(stats.totalPotentialRevenue)}</Text>
-          <Text style={styles.statLabel}>Potential Revenue</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
@@ -430,7 +413,6 @@ const ProductManagementScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Search and Filters */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
@@ -501,7 +483,6 @@ const ProductManagementScreen = () => {
         </View>
       )}
 
-      {/* Products List */}
       <FlatList
         data={filteredProducts}
         renderItem={renderProduct}
@@ -521,7 +502,6 @@ const ProductManagementScreen = () => {
         contentContainerStyle={styles.listContainer}
       />
 
-      {/* Add/Edit Product Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -556,49 +536,15 @@ const ProductManagementScreen = () => {
               placeholderTextColor="#999"
             />
 
-            <View style={styles.row}>
-              <View style={styles.halfWidth}>
-                <Text style={styles.label}>Selling Price *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.price}
-                  onChangeText={(text) => handleInputChange('price', text)}
-                  placeholder="0.00"
-                  keyboardType="decimal-pad"
-                  placeholderTextColor="#999"
-                />
-              </View>
-              <View style={styles.halfWidth}>
-                <Text style={styles.label}>Cost Price *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.cost}
-                  onChangeText={(text) => handleInputChange('cost', text)}
-                  placeholder="0.00"
-                  keyboardType="decimal-pad"
-                  placeholderTextColor="#999"
-                />
-              </View>
-            </View>
-
-            {formData.price && formData.cost && (
-              <View style={styles.statsBox}>
-                <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>Profit per unit:</Text>
-                  <Text style={styles.statsValue}>${calculateProfit()}</Text>
-                </View>
-                <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>Profit Margin:</Text>
-                  <Text style={styles.statsValue}>{calculateMargin()}</Text>
-                </View>
-                <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>ROI:</Text>
-                  <Text style={styles.statsValue}>
-                    {formData.cost ? ((calculateProfit() / formData.cost) * 100).toFixed(1) : 0}%
-                  </Text>
-                </View>
-              </View>
-            )}
+            <Text style={styles.label}>Selling Price *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.price}
+              onChangeText={(text) => handleInputChange('price', text)}
+              placeholder="0.00"
+              keyboardType="decimal-pad"
+              placeholderTextColor="#999"
+            />
 
             <Text style={styles.label}>Category *</Text>
             <View style={styles.categoryContainer}>
@@ -609,7 +555,7 @@ const ProductManagementScreen = () => {
                     styles.categoryButton,
                     formData.category === cat && styles.categoryButtonActive
                   ]}
-                  onPress={() => handleInputChange('category', cat)}
+                  onPress={() => handleCategorySelect(cat)}
                 >
                   <Text style={[
                     styles.categoryButtonText,
@@ -618,6 +564,36 @@ const ProductManagementScreen = () => {
                 </TouchableOpacity>
               ))}
             </View>
+
+            {showCustomCategory && (
+              <View style={styles.customCategoryContainer}>
+                <TextInput
+                  style={[styles.input, styles.customCategoryInput]}
+                  value={customCategory}
+                  onChangeText={setCustomCategory}
+                  placeholder="Enter custom category"
+                  placeholderTextColor="#999"
+                  autoFocus
+                />
+                <TouchableOpacity
+                  style={styles.customCategorySubmit}
+                  onPress={handleCustomCategorySubmit}
+                >
+                  <Text style={styles.customCategorySubmitText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {formData.category && !categories.includes(formData.category) && (
+              <View style={styles.customCategoryBadge}>
+                <Text style={styles.customCategoryBadgeText}>
+                  Custom: {formData.category}
+                </Text>
+                <TouchableOpacity onPress={() => setFormData({ ...formData, category: '' })}>
+                  <Icon name="close" size={16} color="#666" />
+                </TouchableOpacity>
+              </View>
+            )}
 
             <Text style={styles.label}>Initial Quantity</Text>
             <TextInput
@@ -888,33 +864,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#007AFF',
   },
-  costLabel: {
-    fontSize: 11,
-    color: '#666',
-    marginTop: 4,
-  },
-  profitSection: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  profitLabel: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 4,
-  },
-  productProfit: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4caf50',
-  },
-  marginLabel: {
-    fontSize: 11,
-    color: '#666',
-    marginTop: 4,
-  },
   stockSection: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   stockLabel: {
     fontSize: 11,
@@ -922,20 +874,29 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   productStock: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '600',
     color: '#333',
+  },
+  categorySection: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  categoryLabel: {
+    fontSize: 11,
+    color: '#999',
+    marginBottom: 4,
   },
   categoryBadge: {
     backgroundColor: '#e8f4f8',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 4,
-    marginTop: 4,
   },
   categoryText: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#007AFF',
+    fontWeight: '500',
   },
   productActions: {
     flexDirection: 'row',
@@ -1002,13 +963,6 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  halfWidth: {
-    width: '48%',
-  },
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1031,25 +985,38 @@ const styles = StyleSheet.create({
   categoryButtonTextActive: {
     color: '#fff',
   },
-  statsBox: {
-    backgroundColor: '#e8f4f8',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
-  },
-  statsRow: {
+  customCategoryContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 2,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  statsLabel: {
-    fontSize: 13,
-    color: '#666',
+  customCategoryInput: {
+    flex: 1,
+    marginRight: 8,
   },
-  statsValue: {
-    fontSize: 13,
+  customCategorySubmit: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  customCategorySubmitText: {
+    color: '#fff',
     fontWeight: '600',
+  },
+  customCategoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#e8f4f8',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  customCategoryBadgeText: {
     color: '#007AFF',
+    fontWeight: '500',
   },
   saveButton: {
     backgroundColor: '#007AFF',
