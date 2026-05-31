@@ -32,12 +32,11 @@ const ProductManagementScreen = () => {
   
   const [formData, setFormData] = useState({
     name: '',
-    price: '',
+    buyPrice: '',
+    sellPrice: '',
     category: '',
     quantity: '',
-    description: '',
-    sku: '',
-    supplier: ''
+    sku: ''
   });
 
   useEffect(() => {
@@ -84,8 +83,7 @@ const ProductManagementScreen = () => {
     if (searchQuery) {
       filtered = filtered.filter(product => 
         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.supplier?.toLowerCase().includes(searchQuery.toLowerCase())
+        product.sku?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
@@ -97,8 +95,14 @@ const ProductManagementScreen = () => {
       switch(selectedSort) {
         case 'name':
           return a.name?.localeCompare(b.name || '') || 0;
-        case 'price':
-          return (b.price || 0) - (a.price || 0);
+        case 'sellPrice':
+          return (b.sellPrice || 0) - (a.sellPrice || 0);
+        case 'buyPrice':
+          return (b.buyPrice || 0) - (a.buyPrice || 0);
+        case 'profit':
+          const profitA = (a.sellPrice || 0) - (a.buyPrice || 0);
+          const profitB = (b.sellPrice || 0) - (b.buyPrice || 0);
+          return profitB - profitA;
         case 'stock':
           return (a.quantity || 0) - (b.quantity || 0);
         case 'date':
@@ -133,13 +137,41 @@ const ProductManagementScreen = () => {
     }
   };
 
+  const calculateProfit = () => {
+    const sellPrice = parseFloat(formData.sellPrice) || 0;
+    const buyPrice = parseFloat(formData.buyPrice) || 0;
+    return (sellPrice - buyPrice).toFixed(2);
+  };
+
+  const calculateMargin = () => {
+    const sellPrice = parseFloat(formData.sellPrice) || 0;
+    const buyPrice = parseFloat(formData.buyPrice) || 0;
+    if (sellPrice === 0) return '0%';
+    return `${((sellPrice - buyPrice) / sellPrice * 100).toFixed(1)}%`;
+  };
+
+  const calculateROI = () => {
+    const buyPrice = parseFloat(formData.buyPrice) || 0;
+    if (buyPrice === 0) return '0%';
+    const profit = calculateProfit();
+    return `${((parseFloat(profit) / buyPrice) * 100).toFixed(1)}%`;
+  };
+
   const validateForm = () => {
     if (!formData.name.trim()) {
       Alert.alert('Validation Error', 'Please enter product name');
       return false;
     }
-    if (!formData.price || parseFloat(formData.price) <= 0) {
-      Alert.alert('Validation Error', 'Please enter a valid price');
+    if (!formData.buyPrice || parseFloat(formData.buyPrice) <= 0) {
+      Alert.alert('Validation Error', 'Please enter a valid cost price');
+      return false;
+    }
+    if (!formData.sellPrice || parseFloat(formData.sellPrice) <= 0) {
+      Alert.alert('Validation Error', 'Please enter a valid selling price');
+      return false;
+    }
+    if (parseFloat(formData.buyPrice) > parseFloat(formData.sellPrice)) {
+      Alert.alert('Validation Error', 'Cost price cannot be higher than selling price');
       return false;
     }
     if (!formData.category) {
@@ -157,12 +189,11 @@ const ProductManagementScreen = () => {
       const db = getDatabaseInstance();
       const productData = {
         name: formData.name.trim(),
-        price: parseFloat(formData.price),
+        buyPrice: parseFloat(formData.buyPrice),
+        sellPrice: parseFloat(formData.sellPrice),
         category: formData.category,
         quantity: parseInt(formData.quantity) || 0,
-        description: formData.description?.trim() || '',
         sku: formData.sku?.trim() || '',
-        supplier: formData.supplier?.trim() || '',
         updatedAt: new Date().toISOString()
       };
 
@@ -221,12 +252,11 @@ const ProductManagementScreen = () => {
     setEditingProduct(product);
     setFormData({
       name: product.name || '',
-      price: product.price?.toString() || '',
+      buyPrice: product.buyPrice?.toString() || '',
+      sellPrice: product.sellPrice?.toString() || '',
       category: product.category || '',
       quantity: product.quantity?.toString() || '',
-      description: product.description || '',
-      sku: product.sku || '',
-      supplier: product.supplier || ''
+      sku: product.sku || ''
     });
     setShowCustomCategory(false);
     setCustomCategory('');
@@ -270,12 +300,11 @@ const ProductManagementScreen = () => {
     setEditingProduct(null);
     setFormData({
       name: '',
-      price: '',
+      buyPrice: '',
+      sellPrice: '',
       category: '',
       quantity: '',
-      description: '',
-      sku: '',
-      supplier: ''
+      sku: ''
     });
     setShowCustomCategory(false);
     setCustomCategory('');
@@ -294,6 +323,8 @@ const ProductManagementScreen = () => {
 
   const renderProduct = ({ item }) => {
     const stockStatus = getStockStatus(item.quantity);
+    const profit = (item.sellPrice || 0) - (item.buyPrice || 0);
+    const margin = item.sellPrice ? (profit / item.sellPrice * 100).toFixed(1) : 0;
     
     return (
       <View style={styles.productCard}>
@@ -307,22 +338,25 @@ const ProductManagementScreen = () => {
               </Text>
             </View>
           </View>
-          <Text style={styles.productSku}>SKU: {item.sku || 'N/A'}</Text>
+          {item.sku && <Text style={styles.productSku}>SKU: {item.sku}</Text>}
         </View>
 
         <View style={styles.productDetails}>
           <View style={styles.priceSection}>
-            <Text style={styles.priceLabel}>Price</Text>
-            <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
+            <Text style={styles.priceLabel}>Sell Price</Text>
+            <Text style={styles.productPrice}>{formatCurrency(item.sellPrice)}</Text>
+            <Text style={styles.buyPriceLabel}>Cost: {formatCurrency(item.buyPrice)}</Text>
+          </View>
+          
+          <View style={styles.profitSection}>
+            <Text style={styles.profitLabel}>Profit</Text>
+            <Text style={styles.productProfit}>{formatCurrency(profit)}</Text>
+            <Text style={styles.marginLabel}>Margin: {margin}%</Text>
           </View>
           
           <View style={styles.stockSection}>
             <Text style={styles.stockLabel}>Stock</Text>
             <Text style={styles.productStock}>{item.quantity || 0} units</Text>
-          </View>
-          
-          <View style={styles.categorySection}>
-            <Text style={styles.categoryLabel}>Category</Text>
             <View style={styles.categoryBadge}>
               <Text style={styles.categoryText}>{item.category || 'Uncategorized'}</Text>
             </View>
@@ -360,11 +394,13 @@ const ProductManagementScreen = () => {
 
   const getTotalStats = () => {
     const totalProducts = products.length;
-    const totalInventoryValue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
+    const totalInventoryValue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.buyPrice || 0)), 0);
+    const totalPotentialRevenue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.sellPrice || 0)), 0);
+    const totalPotentialProfit = totalPotentialRevenue - totalInventoryValue;
     const lowStockCount = products.filter(p => p.quantity < 10 && p.quantity > 0).length;
     const outOfStockCount = products.filter(p => p.quantity === 0).length;
     
-    return { totalProducts, totalInventoryValue, lowStockCount, outOfStockCount };
+    return { totalProducts, totalInventoryValue, totalPotentialRevenue, totalPotentialProfit, lowStockCount, outOfStockCount };
   };
 
   const stats = getTotalStats();
@@ -404,6 +440,10 @@ const ProductManagementScreen = () => {
           <Text style={styles.statLabel}>Inventory Value</Text>
         </View>
         <View style={styles.statCard}>
+          <Text style={[styles.statValue, styles.profitStat]}>{formatCurrency(stats.totalPotentialProfit)}</Text>
+          <Text style={styles.statLabel}>Potential Profit</Text>
+        </View>
+        <View style={styles.statCard}>
           <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
           <Text style={styles.statLabel}>Low Stock</Text>
         </View>
@@ -418,7 +458,7 @@ const ProductManagementScreen = () => {
           <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name, SKU, or supplier..."
+            placeholder="Search by name or SKU..."
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholderTextColor="#999"
@@ -462,7 +502,7 @@ const ProductManagementScreen = () => {
 
           <Text style={styles.filterTitle}>Sort By</Text>
           <View style={styles.sortButtons}>
-            {['name', 'price', 'stock', 'date'].map((sort) => (
+            {['name', 'sellPrice', 'buyPrice', 'profit', 'stock', 'date'].map((sort) => (
               <TouchableOpacity
                 key={sort}
                 style={[
@@ -475,7 +515,10 @@ const ProductManagementScreen = () => {
                   styles.sortButtonText,
                   selectedSort === sort && styles.sortButtonTextActive
                 ]}>
-                  {sort.charAt(0).toUpperCase() + sort.slice(1)}
+                  {sort === 'sellPrice' ? 'Sell Price' : 
+                   sort === 'buyPrice' ? 'Cost Price' :
+                   sort === 'profit' ? 'Profit' :
+                   sort.charAt(0).toUpperCase() + sort.slice(1)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -532,19 +575,51 @@ const ProductManagementScreen = () => {
               style={styles.input}
               value={formData.sku}
               onChangeText={(text) => handleInputChange('sku', text)}
-              placeholder="Enter unique SKU"
+              placeholder="Enter unique SKU (optional)"
               placeholderTextColor="#999"
             />
 
-            <Text style={styles.label}>Selling Price *</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.price}
-              onChangeText={(text) => handleInputChange('price', text)}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor="#999"
-            />
+            <View style={styles.row}>
+              <View style={styles.halfWidth}>
+                <Text style={styles.label}>Cost Price *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.buyPrice}
+                  onChangeText={(text) => handleInputChange('buyPrice', text)}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#999"
+                />
+              </View>
+              <View style={styles.halfWidth}>
+                <Text style={styles.label}>Selling Price *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.sellPrice}
+                  onChangeText={(text) => handleInputChange('sellPrice', text)}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#999"
+                />
+              </View>
+            </View>
+
+            {formData.buyPrice && formData.sellPrice && (
+              <View style={styles.statsBox}>
+                <View style={styles.statsRow}>
+                  <Text style={styles.statsLabel}>💰 Profit per unit:</Text>
+                  <Text style={[styles.statsValue, styles.profitText]}>${calculateProfit()}</Text>
+                </View>
+                <View style={styles.statsRow}>
+                  <Text style={styles.statsLabel}>📊 Profit Margin:</Text>
+                  <Text style={[styles.statsValue, styles.profitText]}>{calculateMargin()}</Text>
+                </View>
+                <View style={styles.statsRow}>
+                  <Text style={styles.statsLabel}>📈 ROI:</Text>
+                  <Text style={[styles.statsValue, styles.profitText]}>{calculateROI()}</Text>
+                </View>
+              </View>
+            )}
 
             <Text style={styles.label}>Category *</Text>
             <View style={styles.categoryContainer}>
@@ -603,26 +678,6 @@ const ProductManagementScreen = () => {
               placeholder="0"
               keyboardType="numeric"
               placeholderTextColor="#999"
-            />
-
-            <Text style={styles.label}>Supplier Information</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.supplier}
-              onChangeText={(text) => handleInputChange('supplier', text)}
-              placeholder="Enter supplier name"
-              placeholderTextColor="#999"
-            />
-
-            <Text style={styles.label}>Product Description</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={formData.description}
-              onChangeText={(text) => handleInputChange('description', text)}
-              placeholder="Enter product description, features, specifications..."
-              placeholderTextColor="#999"
-              multiline
-              numberOfLines={4}
             />
 
             <TouchableOpacity
@@ -698,6 +753,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#007AFF',
     marginBottom: 4,
+  },
+  profitStat: {
+    color: '#4caf50',
   },
   statLabel: {
     fontSize: 12,
@@ -792,6 +850,7 @@ const styles = StyleSheet.create({
   },
   sortButtonText: {
     color: '#666',
+    fontSize: 11,
   },
   sortButtonTextActive: {
     color: '#fff',
@@ -840,6 +899,7 @@ const styles = StyleSheet.create({
   productSku: {
     fontSize: 12,
     color: '#999',
+    marginTop: 2,
   },
   productDetails: {
     flexDirection: 'row',
@@ -864,9 +924,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#007AFF',
   },
-  stockSection: {
+  buyPriceLabel: {
+    fontSize: 10,
+    color: '#666',
+    marginTop: 2,
+  },
+  profitSection: {
     flex: 1,
     alignItems: 'center',
+  },
+  profitLabel: {
+    fontSize: 11,
+    color: '#999',
+    marginBottom: 4,
+  },
+  productProfit: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4caf50',
+  },
+  marginLabel: {
+    fontSize: 10,
+    color: '#666',
+    marginTop: 2,
+  },
+  stockSection: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   stockLabel: {
     fontSize: 11,
@@ -878,23 +962,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  categorySection: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  categoryLabel: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 4,
-  },
   categoryBadge: {
     backgroundColor: '#e8f4f8',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderRadius: 4,
+    marginTop: 4,
   },
   categoryText: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#007AFF',
     fontWeight: '500',
   },
@@ -959,9 +1035,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  halfWidth: {
+    width: '48%',
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -1017,6 +1096,28 @@ const styles = StyleSheet.create({
   customCategoryBadgeText: {
     color: '#007AFF',
     fontWeight: '500',
+  },
+  statsBox: {
+    backgroundColor: '#e8f4f8',
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 2,
+  },
+  statsLabel: {
+    fontSize: 13,
+    color: '#666',
+  },
+  statsValue: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  profitText: {
+    color: '#4caf50',
   },
   saveButton: {
     backgroundColor: '#007AFF',

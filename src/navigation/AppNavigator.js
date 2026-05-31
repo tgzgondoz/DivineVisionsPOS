@@ -114,16 +114,6 @@ const AppNavigator = ({ onLogout }) => {
         initialParams={{ screenName: 'Inventory Dashboard' }}
       />
       
-      {/* Admin Dashboard - Only Admin */}
-      <Tab.Screen 
-        name="Admin" 
-        component={isAdmin() ? AdminDashboardScreen : RestrictedScreen}
-        options={{ 
-          title: 'Admin Dashboard',
-          headerShown: true 
-        }}
-        initialParams={{ screenName: 'Admin Dashboard' }}
-      />
     </Tab.Navigator>
   );
 };
