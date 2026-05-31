@@ -55,13 +55,13 @@ const LoginScreen = ({ onLogin }) => {
   };
 
   const demoAdmin = () => {
-    setEmail('admin@gondopos.com');
-    setPassword('Gondo@Admin2026#Secure');
+    setEmail('admin@devinepos.com');
+    setPassword('Devine@Admin2026#Secure');
   };
 
   const demoCashier = () => {
-    setEmail('cashier@gondopos.com');
-    setPassword('Gondo@Cashier2026#Strong');
+    setEmail('cashier@devinepos.com');
+    setPassword('Devine@Cashier2026#Strong');
   };
 
   return (
@@ -83,7 +83,7 @@ const LoginScreen = ({ onLogin }) => {
               <Icon name="storefront" size={60} color="#fec82b" />
             </View>
           )}
-          <Text style={styles.title}>TuckShop</Text>
+          <Text style={styles.title}>DevinePOS</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
 
@@ -127,18 +127,6 @@ const LoginScreen = ({ onLogin }) => {
               <Text style={styles.loginButtonText}>Login</Text>
             )}
           </TouchableOpacity>
-
-          <View style={styles.demoContainer}>
-            <Text style={styles.demoTitle}>Demo Credentials 2026:</Text>
-            <TouchableOpacity onPress={demoAdmin} style={styles.demoButton}>
-              <Text style={styles.demoText}>Admin: admin@gondopos.com</Text>
-              <Text style={styles.demoPassword}>Gondo@Admin2026#Secure</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={demoCashier} style={styles.demoButton}>
-              <Text style={styles.demoText}>Cashier: cashier@gondopos.com</Text>
-              <Text style={styles.demoPassword}>Gondo@Cashier2026#Strong</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -173,12 +161,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#0e0b05',  // Dark brown/black for text
+    color: '#0e0b05',
     marginTop: 0,
   },
   subtitle: {
     fontSize: 16,
-    color: '#75482f',  // Warm brown for subtitle
+    color: '#75482f',
     marginTop: 8,
   },
   formContainer: {
@@ -195,7 +183,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#75482f',  // Brown border
+    borderColor: '#75482f',
     borderRadius: 8,
     marginBottom: 16,
     paddingHorizontal: 12,
@@ -208,20 +196,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#0e0b05',  // Dark text
+    color: '#0e0b05',
   },
   eyeIcon: {
     padding: 8,
   },
   loginButton: {
-    backgroundColor: '#fec82b',  // Yellow/gold as primary button
+    backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   loginButtonText: {
-    color: '#0e0b05',  // Dark text on yellow button
+    color: '#0e0b05',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -229,26 +217,36 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#75482f',
+    borderTopColor: '#e0e0e0',
   },
   demoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#75482f',  // Brown for demo title
-    marginBottom: 8,
+    color: '#75482f',
+    marginBottom: 12,
   },
   demoButton: {
-    paddingVertical: 6,
+    paddingVertical: 8,
+    marginBottom: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  demoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
   },
   demoText: {
     fontSize: 12,
-    color: '#0e0b05',  // Dark text
+    color: '#0e0b05',
     fontWeight: '500',
   },
   demoPassword: {
     fontSize: 11,
-    color: '#75482f',  // Brown for password text
-    marginTop: 2,
+    color: '#75482f',
+    marginLeft: 20,
   },
 });
 

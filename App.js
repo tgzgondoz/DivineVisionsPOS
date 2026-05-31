@@ -20,10 +20,10 @@ const initializeDefaultUsers = async () => {
     const users = await AuthService.getUsers();
     if (users.length === 0) {
       // Create default admin with strong password for 2026
-      await AuthService.registerUser('admin@gondopos.com', 'Gondo@Admin2026#Secure', 'System Administrator', 'admin');
+      await AuthService.registerUser('admin@devinepos.com', 'Devine@Admin2026#Secure', 'System Administrator', 'admin');
       // Create default cashier with strong password for 2026
-      await AuthService.registerUser('cashier@gondopos.com', 'Gondo@Cashier2026#Strong', 'Default Cashier', 'cashier');
-      console.log('Default users created successfully for 2026');
+      await AuthService.registerUser('cashier@devinepos.com', 'Devine@Cashier2026#Strong', 'Default Cashier', 'cashier');
+      console.log('Default DevinePOS users created successfully for 2026');
     }
   } catch (error) {
     console.error('Error initializing default users:', error);
@@ -74,8 +74,8 @@ const MainApp = () => {
     return (
       <SafeAreaProvider>
         <SafeAreaView style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading GondoPOS 2026...</Text>
+          <ActivityIndicator size="large" color="#fec82b" />
+          <Text style={styles.loadingText}>Loading DevinePOS 2026...</Text>
         </SafeAreaView>
       </SafeAreaProvider>
     );
@@ -124,7 +124,8 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: '#75482f',
+    fontWeight: '500',
   },
 });
 
