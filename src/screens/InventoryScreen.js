@@ -5,7 +5,8 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert  // Added Alert
 } from 'react-native';
 import ProductService from '../services/ProductService';
 
@@ -37,21 +38,18 @@ const InventoryScreen = ({ navigation }) => {
   const calculateStats = (productsList) => {
     const totalProducts = productsList.length;
     
-    // Calculate inventory value based on cost price (buyPrice)
     const totalValue = productsList.reduce((sum, p) => {
       const quantity = p.quantity || 0;
       const cost = p.buyPrice || p.cost || 0;
       return sum + (quantity * cost);
     }, 0);
     
-    // Calculate total retail value based on selling price
     const totalRetailValue = productsList.reduce((sum, p) => {
       const quantity = p.quantity || 0;
       const sellPrice = p.sellPrice || 0;
       return sum + (quantity * sellPrice);
     }, 0);
     
-    // Calculate total potential profit
     const totalProfit = totalRetailValue - totalValue;
     
     const lowStockItems = productsList.filter(p => p.quantity < 10 && p.quantity > 0).length;
@@ -80,6 +78,47 @@ const InventoryScreen = ({ navigation }) => {
     return `$${amount?.toFixed(2) || '0.00'}`;
   };
 
+  const showProductDetails = (item) => {
+    const costPrice = item.buyPrice || item.cost || 0;
+    const sellPrice = item.sellPrice || 0;
+    const profitPerUnit = sellPrice - costPrice;
+    const totalValue = (item.quantity || 0) * costPrice;
+    const totalProfit = (item.quantity || 0) * profitPerUnit;
+    const status = getStockStatus(item.quantity);
+    
+    Alert.alert(
+      `📦 ${item.name}`,
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📋 PRODUCT INFORMATION\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `🔖 SKU: ${item.sku || 'N/A'}\n` +
+      `📂 Category: ${item.category || 'Uncategorized'}\n` +
+      `📊 Status: ${status.label}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💰 PRICING\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `💵 Cost Price: ${formatCurrency(costPrice)}\n` +
+      `💲 Selling Price: ${formatCurrency(sellPrice)}\n` +
+      `📈 Profit/Unit: ${formatCurrency(profitPerUnit)}\n` +
+      `📊 Margin: ${costPrice > 0 ? ((profitPerUnit / costPrice) * 100).toFixed(1) : 0}%\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📦 INVENTORY\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `🔢 Quantity: ${item.quantity || 0} units\n` +
+      `💎 Total Value: ${formatCurrency(totalValue)}\n` +
+      `🎯 Potential Revenue: ${formatCurrency((item.quantity || 0) * sellPrice)}\n` +
+      `🏆 Potential Profit: ${formatCurrency(totalProfit)}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📅 Created: ${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}\n` +
+      `🔄 Updated: ${item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'N/A'}`,
+      [
+        { text: 'Close', style: 'cancel' },
+        { text: 'OK', onPress: () => console.log('Product viewed:', item.name) }
+      ],
+      { cancelable: true }
+    );
+  };
+
   const renderInventoryItem = ({ item }) => {
     const status = getStockStatus(item.quantity);
     const costPrice = item.buyPrice || item.cost || 0;
@@ -90,7 +129,8 @@ const InventoryScreen = ({ navigation }) => {
     return (
       <TouchableOpacity 
         style={styles.inventoryItem}
-        onPress={() => navigation.navigate('ProductDetails', { product: item })}
+        onPress={() => showProductDetails(item)}  // Now shows Alert instead of navigating
+        activeOpacity={0.7}
       >
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{item.name}</Text>
