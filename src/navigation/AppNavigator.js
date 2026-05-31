@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View, Text, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 
@@ -45,8 +45,6 @@ const AppNavigator = ({ onLogout }) => {
         tabBarActiveTintColor: '#fec82b',
         tabBarInactiveTintColor: '#75482f',
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: '#e0e0e0',
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
@@ -56,11 +54,10 @@ const AppNavigator = ({ onLogout }) => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor: '#fff',
+          
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#e0e0e0',
         },
         headerTintColor: '#0e0b05',
         headerTitleStyle: {
@@ -68,6 +65,18 @@ const AppNavigator = ({ onLogout }) => {
           fontSize: 18,
         },
         headerTitleAlign: 'center',
+        headerLeft: () => (
+          <View style={{ marginLeft: 16, flexDirection: 'row', alignItems: 'center' }}>
+            <Image 
+              source={require('../../assets/logo.png')} 
+              style={{ width: 32, height: 32, borderRadius: 16 }}
+              resizeMode="contain"
+            />
+            <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#75482f' }}>
+              POS
+            </Text>
+          </View>
+        ),
         headerRight: () => (
           <TouchableOpacity 
             onPress={onLogout} 

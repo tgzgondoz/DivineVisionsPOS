@@ -364,13 +364,6 @@ const SalesHistoryScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {topProduct && (
-        <View style={styles.topProductBanner}>
-          <Icon name="trophy-outline" size={14} color="#fec82b" />
-          <Text style={styles.topProductText}>Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
-        </View>
-      )}
-
       <FlatList
         data={filteredSales}
         renderItem={renderSaleItem}

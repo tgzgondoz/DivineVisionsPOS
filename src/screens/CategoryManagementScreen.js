@@ -415,13 +415,9 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
     margin: 16,
     borderRadius: 12,
     padding: 16,
-    elevation: 2,
-    shadowColor: '#0e0b05',
-    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     marginTop: 16,
