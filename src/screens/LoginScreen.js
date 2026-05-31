@@ -83,7 +83,7 @@ const LoginScreen = ({ onLogin }) => {
               <Icon name="storefront" size={60} color="#fec82b" />
             </View>
           )}
-          <Text style={styles.title}>DevinePOS</Text>
+          <Text style={styles.title}>TuckShop</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
 
