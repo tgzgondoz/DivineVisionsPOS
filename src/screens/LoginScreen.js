@@ -9,7 +9,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthService from '../services/AuthService';
@@ -19,6 +20,7 @@ const LoginScreen = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim()) {
@@ -34,7 +36,6 @@ const LoginScreen = ({ onLogin }) => {
     try {
       const result = await AuthService.loginUser(email, password);
       if (result.success && result.user) {
-        // Ensure user object has all required fields
         const userData = {
           id: result.user.id,
           email: result.user.email,
@@ -53,7 +54,6 @@ const LoginScreen = ({ onLogin }) => {
     }
   };
 
-  // Demo credentials for testing with strong passwords for 2026
   const demoAdmin = () => {
     setEmail('admin@gondopos.com');
     setPassword('Gondo@Admin2026#Secure');
@@ -71,37 +71,48 @@ const LoginScreen = ({ onLogin }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
-          <Icon name="cart" size={80} color="#007AFF" />
-          <Text style={styles.title}>GondoPOS 2026</Text>
+          {!imageError ? (
+            <Image 
+              source={require('../../assets/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <View style={[styles.logo, styles.fallbackLogo]}>
+              <Icon name="storefront" size={60} color="#fec82b" />
+            </View>
+          )}
+          <Text style={styles.title}>TuckShop</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <Icon name="mail" size={20} color="#999" style={styles.inputIcon} />
+            <Icon name="mail" size={20} color="#75482f" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Email"
+              placeholderTextColor="#999"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
-              placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="lock-closed" size={20} color="#999" style={styles.inputIcon} />
+            <Icon name="lock-closed" size={20} color="#75482f" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Password"
+              placeholderTextColor="#999"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
-              placeholderTextColor="#999"
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-              <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#999" />
+              <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#75482f" />
             </TouchableOpacity>
           </View>
 
@@ -111,7 +122,7 @@ const LoginScreen = ({ onLogin }) => {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#0e0b05" />
             ) : (
               <Text style={styles.loginButtonText}>Login</Text>
             )}
@@ -120,10 +131,12 @@ const LoginScreen = ({ onLogin }) => {
           <View style={styles.demoContainer}>
             <Text style={styles.demoTitle}>Demo Credentials 2026:</Text>
             <TouchableOpacity onPress={demoAdmin} style={styles.demoButton}>
-              <Text style={styles.demoText}>Admin: admin@gondopos.com / Gondo@Admin2026#Secure</Text>
+              <Text style={styles.demoText}>Admin: admin@gondopos.com</Text>
+              <Text style={styles.demoPassword}>Gondo@Admin2026#Secure</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={demoCashier} style={styles.demoButton}>
-              <Text style={styles.demoText}>Cashier: cashier@gondopos.com / Gondo@Cashier2026#Strong</Text>
+              <Text style={styles.demoText}>Cashier: cashier@gondopos.com</Text>
+              <Text style={styles.demoPassword}>Gondo@Cashier2026#Strong</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -146,15 +159,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+  },
+  fallbackLogo: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
+    color: '#0e0b05',  // Dark brown/black for text
+    marginTop: 0,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#75482f',  // Warm brown for subtitle
     marginTop: 8,
   },
   formContainer: {
@@ -162,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -171,7 +195,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#75482f',  // Brown border
     borderRadius: 8,
     marginBottom: 16,
     paddingHorizontal: 12,
@@ -184,20 +208,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: '#0e0b05',  // Dark text
   },
   eyeIcon: {
     padding: 8,
   },
   loginButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',  // Yellow/gold as primary button
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#0e0b05',  // Dark text on yellow button
     fontSize: 18,
     fontWeight: '600',
   },
@@ -205,12 +229,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#75482f',
   },
   demoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#75482f',  // Brown for demo title
     marginBottom: 8,
   },
   demoButton: {
@@ -218,7 +242,13 @@ const styles = StyleSheet.create({
   },
   demoText: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#0e0b05',  // Dark text
+    fontWeight: '500',
+  },
+  demoPassword: {
+    fontSize: 11,
+    color: '#75482f',  // Brown for password text
+    marginTop: 2,
   },
 });
 

@@ -58,20 +58,16 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
   const loadSystemStats = () => {
     const db = getDatabaseInstance();
     
-    // Get product stats
     const productsRef = ref(db, 'products');
     onValue(productsRef, (snapshot) => {
       const data = snapshot.val();
       const products = data ? Object.keys(data).length : 0;
-      // You can display this elsewhere
     });
     
-    // Get sales stats
     const salesRef = ref(db, 'sales');
     onValue(salesRef, (snapshot) => {
       const data = snapshot.val();
       const sales = data ? Object.keys(data).length : 0;
-      // You can display this elsewhere
     });
   };
 
@@ -163,10 +159,14 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
           <Text style={styles.userEmail}>{item.email}</Text>
           <View style={styles.userMeta}>
             <View style={[styles.roleBadge, item.role === 'admin' ? styles.adminBadge : styles.cashierBadge]}>
-              <Text style={styles.roleText}>{item.role?.toUpperCase()}</Text>
+              <Text style={[styles.roleText, item.role === 'admin' ? styles.adminRoleText : styles.cashierRoleText]}>
+                {item.role?.toUpperCase()}
+              </Text>
             </View>
             <View style={[styles.statusBadge, item.isActive ? styles.activeBadge : styles.inactiveBadge]}>
-              <Text style={styles.statusText}>{item.isActive ? 'Active' : 'Inactive'}</Text>
+              <Text style={[styles.statusText, item.isActive ? styles.activeStatusText : styles.inactiveStatusText]}>
+                {item.isActive ? 'Active' : 'Inactive'}
+              </Text>
             </View>
           </View>
         </View>
@@ -178,7 +178,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
             style={[styles.actionBtn, styles.promoteBtn]}
             onPress={() => handleChangeRole(item.id, 'admin')}
           >
-            <Icon name="arrow-up" size={16} color="#fff" />
+            <Icon name="arrow-up" size={16} color="#0e0b05" />
             <Text style={styles.actionBtnText}>Promote</Text>
           </TouchableOpacity>
         )}
@@ -214,7 +214,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#fec82b" />
       </View>
     );
   }
@@ -222,8 +222,6 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header removed as requested */}
-
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{stats.totalUsers}</Text>
@@ -246,7 +244,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
         <View style={styles.listHeader}>
           <Text style={styles.listTitle}>User Management</Text>
           <TouchableOpacity style={styles.addUserBtn} onPress={() => setModalVisible(true)}>
-            <Icon name="add" size={24} color="#007AFF" />
+            <Icon name="add" size={24} color="#fec82b" />
             <Text style={styles.addUserText}>Add User</Text>
           </TouchableOpacity>
         </View>
@@ -258,6 +256,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
+              <Icon name="people" size={64} color="#75482f" />
               <Text style={styles.emptyText}>No users found</Text>
             </View>
           }
@@ -274,7 +273,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Add New User</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <Icon name="close" size={24} color="#333" />
+                  <Icon name="close" size={24} color="#75482f" />
                 </TouchableOpacity>
               </View>
               
@@ -285,6 +284,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
                   value={newUser.fullName}
                   onChangeText={(text) => setNewUser({ ...newUser, fullName: text })}
                   placeholder="Enter full name"
+                  placeholderTextColor="#75482f"
                 />
 
                 <Text style={styles.label}>Email *</Text>
@@ -293,6 +293,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
                   value={newUser.email}
                   onChangeText={(text) => setNewUser({ ...newUser, email: text })}
                   placeholder="Enter email"
+                  placeholderTextColor="#75482f"
                   autoCapitalize="none"
                   keyboardType="email-address"
                 />
@@ -303,6 +304,7 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
                   value={newUser.password}
                   onChangeText={(text) => setNewUser({ ...newUser, password: text })}
                   placeholder="Enter password"
+                  placeholderTextColor="#75482f"
                   secureTextEntry
                 />
 
@@ -360,10 +362,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   statCard: {
     flex: 1,
@@ -372,7 +376,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
     marginBottom: 4,
   },
   adminStat: {
@@ -382,11 +386,11 @@ const styles = StyleSheet.create({
     color: '#4caf50',
   },
   activeStat: {
-    color: '#007AFF',
+    color: '#fec82b',
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#75482f',
   },
   listHeader: {
     flexDirection: 'row',
@@ -398,14 +402,18 @@ const styles = StyleSheet.create({
   listTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   addUserBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fec82b20',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   addUserText: {
-    color: '#007AFF',
+    color: '#fec82b',
     marginLeft: 4,
     fontWeight: '600',
   },
@@ -419,10 +427,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#fec82b',
   },
   userInfo: {
     flexDirection: 'row',
@@ -432,7 +442,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -443,11 +453,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   userEmail: {
     fontSize: 13,
-    color: '#666',
+    color: '#75482f',
     marginTop: 2,
   },
   userMeta: {
@@ -469,7 +479,12 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 10,
     fontWeight: '600',
+  },
+  adminRoleText: {
     color: '#ff4444',
+  },
+  cashierRoleText: {
+    color: '#4caf50',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -480,12 +495,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#4caf5020',
   },
   inactiveBadge: {
-    backgroundColor: '#99999920',
+    backgroundColor: '#75482f20',
   },
   statusText: {
     fontSize: 10,
     fontWeight: '600',
+  },
+  activeStatusText: {
     color: '#4caf50',
+  },
+  inactiveStatusText: {
+    color: '#75482f',
   },
   userActions: {
     flexDirection: 'row',
@@ -501,7 +521,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   promoteBtn: {
-    backgroundColor: '#4caf50',
+    backgroundColor: '#fec82b',
   },
   demoteBtn: {
     backgroundColor: '#ff8800',
@@ -516,9 +536,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff4444',
   },
   actionBtnText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 11,
     marginLeft: 4,
+    fontWeight: '500',
   },
   modalContainer: {
     flex: 1,
@@ -536,7 +557,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   modalForm: {
     padding: 16,
@@ -546,7 +567,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12,
-    color: '#333',
+    color: '#0e0b05',
   },
   input: {
     backgroundColor: '#f8f8f8',
@@ -555,6 +576,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    color: '#0e0b05',
   },
   roleSelector: {
     flexDirection: 'row',
@@ -564,21 +586,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     marginHorizontal: 4,
     borderRadius: 8,
   },
   roleOptionActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   roleOptionText: {
-    color: '#666',
+    color: '#75482f',
   },
   roleOptionTextActive: {
-    color: '#fff',
+    color: '#0e0b05',
+    fontWeight: '600',
   },
   submitBtn: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -586,7 +609,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   submitBtnText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -596,7 +619,8 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: '#75482f',
+    marginTop: 12,
   },
 });
 

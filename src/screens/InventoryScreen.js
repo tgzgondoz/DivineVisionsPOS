@@ -6,7 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Alert  // Added Alert
+  Alert
 } from 'react-native';
 import ProductService from '../services/ProductService';
 
@@ -70,7 +70,7 @@ const InventoryScreen = ({ navigation }) => {
   const getStockStatus = (quantity) => {
     if (quantity <= 0) return { label: 'Out of Stock', color: '#ff4444' };
     if (quantity < 10) return { label: 'Critical', color: '#ff8800' };
-    if (quantity < 50) return { label: 'Normal', color: '#ffcc00' };
+    if (quantity < 50) return { label: 'Normal', color: '#fec82b' };
     return { label: 'Good', color: '#4caf50' };
   };
 
@@ -129,7 +129,7 @@ const InventoryScreen = ({ navigation }) => {
     return (
       <TouchableOpacity 
         style={styles.inventoryItem}
-        onPress={() => showProductDetails(item)}  // Now shows Alert instead of navigating
+        onPress={() => showProductDetails(item)}
         activeOpacity={0.7}
       >
         <View style={styles.itemInfo}>
@@ -161,7 +161,7 @@ const InventoryScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#fec82b" />
       </View>
     );
   }
@@ -238,6 +238,8 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
     marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   statCard: {
     width: '33.33%',
@@ -249,12 +251,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#75482f',
     textAlign: 'center',
   },
   warning: {
@@ -271,15 +273,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    marginTop: 8,
   },
   listHeaderTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   listHeaderSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#75482f',
     marginTop: 4,
   },
   inventoryItem: {
@@ -292,10 +295,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#fec82b',
   },
   itemInfo: {
     flex: 1,
@@ -303,22 +308,23 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
     marginBottom: 4,
   },
   itemSku: {
     fontSize: 12,
-    color: '#999',
+    color: '#75482f',
     marginBottom: 2,
   },
   itemCategory: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#fec82b',
     marginBottom: 2,
+    fontWeight: '500',
   },
   itemPriceInfo: {
     fontSize: 11,
-    color: '#666',
+    color: '#75482f',
   },
   itemStatus: {
     alignItems: 'flex-end',
@@ -335,7 +341,7 @@ const styles = StyleSheet.create({
   },
   itemValue: {
     fontSize: 12,
-    color: '#666',
+    color: '#75482f',
     marginBottom: 2,
   },
   itemProfit: {
@@ -350,7 +356,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: '#75482f',
   },
   emptySubtext: {
     fontSize: 14,

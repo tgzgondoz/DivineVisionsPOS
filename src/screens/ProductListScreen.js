@@ -11,6 +11,7 @@ import {
   RefreshControl,
   ScrollView
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import ProductService from '../services/ProductService';
 
 const ProductListScreen = ({ navigation }) => {
@@ -120,21 +121,27 @@ const ProductListScreen = ({ navigation }) => {
       <TouchableOpacity
         style={styles.productCard}
         onPress={() => navigation.navigate('ProductDetails', { product: item })}
+        activeOpacity={0.7}
       >
         <View style={styles.productHeader}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <Text style={[styles.status, { color: statusColor }]}>
-            {status}
-          </Text>
+          <View style={styles.productTitleContainer}>
+            <Icon name="cube" size={18} color="#fec82b" />
+            <Text style={styles.productName}>{item.name}</Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
+            <Text style={[styles.status, { color: statusColor }]}>
+              {status}
+            </Text>
+          </View>
         </View>
         
         <Text style={styles.productSku}>SKU: {item.sku || 'N/A'}</Text>
         
         <View style={styles.productDetails}>
           <View>
-            <Text style={styles.priceLabel}>Price</Text>
-            <Text style={styles.price}>${item.price?.toFixed(2)}</Text>
-            <Text style={styles.costText}>Cost: ${item.cost?.toFixed(2)}</Text>
+            <Text style={styles.priceLabel}>Selling Price</Text>
+            <Text style={styles.price}>${item.sellPrice?.toFixed(2)}</Text>
+            <Text style={styles.costText}>Cost: ${item.buyPrice?.toFixed(2)}</Text>
           </View>
           
           <View style={styles.rightDetails}>
@@ -151,14 +158,16 @@ const ProductListScreen = ({ navigation }) => {
             style={[styles.actionButton, styles.restockButton]}
             onPress={() => handleRestock(item)}
           >
-            <Text style={styles.buttonText}>Restock</Text>
+            <Icon name="add-circle" size={16} color="#0e0b05" />
+            <Text style={styles.restockButtonText}>Restock</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleDeleteProduct(item.id, item.name)}
           >
-            <Text style={styles.buttonText}>Delete</Text>
+            <Icon name="trash-bin" size={16} color="#fff" />
+            <Text style={styles.deleteButtonText}>Delete</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -170,7 +179,7 @@ const ProductListScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#fec82b" />
       </View>
     );
   }
@@ -178,13 +187,19 @@ const ProductListScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
+        <Icon name="search" size={18} color="#75482f" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="🔍 Search products..."
+          placeholder="Search products..."
+          placeholderTextColor="#75482f"
           value={searchQuery}
           onChangeText={handleSearch}
-          placeholderTextColor="#999"
         />
+        {searchQuery !== '' && (
+          <TouchableOpacity onPress={() => handleSearch('')}>
+            <Icon name="close-circle" size={18} color="#75482f" />
+          </TouchableOpacity>
+        )}
       </View>
       
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
@@ -214,17 +229,19 @@ const ProductListScreen = ({ navigation }) => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
+            <Icon name="cube-outline" size={64} color="#75482f" />
             <Text style={styles.emptyText}>No products found</Text>
             <Text style={styles.emptySubtext}>Tap + to add your first product</Text>
           </View>
         }
+        contentContainerStyle={styles.listContainer}
       />
       
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('AddProduct')}
       >
-        <Text style={styles.fabText}>+</Text>
+        <Icon name="add" size={32} color="#0e0b05" />
       </TouchableOpacity>
     </View>
   );
@@ -241,16 +258,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
+  searchIcon: {
+    marginRight: 8,
+  },
   searchInput: {
-    backgroundColor: '#f0f0f0',
+    flex: 1,
+    backgroundColor: '#f5f5f5',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color: '#0e0b05',
   },
   categoryScroll: {
     backgroundColor: '#fff',
@@ -261,28 +285,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     marginHorizontal: 4,
   },
   categoryChipActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   categoryChipText: {
-    color: '#666',
+    color: '#75482f',
   },
   categoryChipTextActive: {
-    color: '#fff',
+    color: '#0e0b05',
+    fontWeight: '600',
+  },
+  listContainer: {
+    paddingBottom: 16,
   },
   productCard: {
     backgroundColor: '#fff',
     margin: 16,
+    marginBottom: 8,
     padding: 16,
     borderRadius: 12,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    borderLeftWidth: 4,
+    borderLeftColor: '#fec82b',
   },
   productHeader: {
     flexDirection: 'row',
@@ -290,60 +321,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  productTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   productName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
+    marginLeft: 8,
     flex: 1,
   },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
   status: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   productSku: {
     fontSize: 12,
-    color: '#999',
+    color: '#75482f',
     marginBottom: 12,
+    marginLeft: 26,
   },
   productDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+    marginLeft: 26,
   },
   priceLabel: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#75482f',
+    marginBottom: 2,
   },
   price: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
   },
   costText: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 11,
+    color: '#75482f',
     marginTop: 4,
   },
   rightDetails: {
     alignItems: 'flex-end',
   },
   quantityLabel: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#75482f',
+    marginBottom: 2,
   },
   quantity: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fec82b',
   },
   profitText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#4caf50',
     marginTop: 4,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginLeft: 26,
   },
   actionButton: {
     flex: 1,
@@ -351,16 +398,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 4,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   restockButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: '#fec82b',
+  },
+  restockButtonText: {
+    color: '#0e0b05',
+    fontWeight: '600',
+    marginLeft: 6,
   },
   deleteButton: {
     backgroundColor: '#ff4444',
   },
-  buttonText: {
+  deleteButtonText: {
     color: '#fff',
     fontWeight: '600',
+    marginLeft: 6,
   },
   fab: {
     position: 'absolute',
@@ -369,18 +424,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-  },
-  fabText: {
-    fontSize: 32,
-    color: '#fff',
   },
   emptyContainer: {
     flex: 1,
@@ -390,7 +441,8 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: '#75482f',
+    marginTop: 12,
   },
   emptySubtext: {
     fontSize: 14,

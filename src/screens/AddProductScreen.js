@@ -78,8 +78,8 @@ const AddProductScreen = ({ navigation }) => {
     try {
       const newProduct = {
         name: product.name.trim(),
-        price: parseFloat(product.price),
-        cost: parseFloat(product.cost),
+        sellPrice: parseFloat(product.price),
+        buyPrice: parseFloat(product.cost),
         category: product.category,
         quantity: parseInt(product.quantity) || 0,
         description: product.description.trim(),
@@ -107,7 +107,7 @@ const AddProductScreen = ({ navigation }) => {
           value={product.name}
           onChangeText={(text) => handleInputChange('name', text)}
           placeholder="Enter product name"
-          placeholderTextColor="#999"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>SKU</Text>
@@ -116,39 +116,42 @@ const AddProductScreen = ({ navigation }) => {
           value={product.sku}
           onChangeText={(text) => handleInputChange('sku', text)}
           placeholder="Enter SKU (optional)"
-          placeholderTextColor="#999"
+          placeholderTextColor="#75482f"
         />
 
         <View style={styles.row}>
           <View style={styles.halfWidth}>
-            <Text style={styles.label}>Price *</Text>
+            <Text style={styles.label}>Selling Price *</Text>
             <TextInput
               style={styles.input}
               value={product.price}
               onChangeText={(text) => handleInputChange('price', text)}
               placeholder="0.00"
               keyboardType="decimal-pad"
-              placeholderTextColor="#999"
+              placeholderTextColor="#75482f"
             />
           </View>
           
           <View style={styles.halfWidth}>
-            <Text style={styles.label}>Cost *</Text>
+            <Text style={styles.label}>Cost Price *</Text>
             <TextInput
               style={styles.input}
               value={product.cost}
               onChangeText={(text) => handleInputChange('cost', text)}
               placeholder="0.00"
               keyboardType="decimal-pad"
-              placeholderTextColor="#999"
+              placeholderTextColor="#75482f"
             />
           </View>
         </View>
 
         {product.price && product.cost && (
           <View style={styles.statsContainer}>
-            <Text style={styles.statsText}>💰 Profit: ${calculateProfit()}</Text>
-            <Text style={styles.statsText}>📊 Margin: {calculateMargin()}</Text>
+            <Icon name="trending-up" size={16} color="#fec82b" />
+            <Text style={styles.statsText}> Profit: ${calculateProfit()}</Text>
+            <View style={styles.statsDivider} />
+            <Icon name="pie-chart" size={16} color="#fec82b" />
+            <Text style={styles.statsText}> Margin: {calculateMargin()}</Text>
           </View>
         )}
 
@@ -178,7 +181,7 @@ const AddProductScreen = ({ navigation }) => {
           onChangeText={(text) => handleInputChange('quantity', text)}
           placeholder="0"
           keyboardType="numeric"
-          placeholderTextColor="#999"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>Supplier</Text>
@@ -187,7 +190,7 @@ const AddProductScreen = ({ navigation }) => {
           value={product.supplier}
           onChangeText={(text) => handleInputChange('supplier', text)}
           placeholder="Enter supplier name (optional)"
-          placeholderTextColor="#999"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>Description</Text>
@@ -196,7 +199,7 @@ const AddProductScreen = ({ navigation }) => {
           value={product.description}
           onChangeText={(text) => handleInputChange('description', text)}
           placeholder="Enter product description (optional)"
-          placeholderTextColor="#999"
+          placeholderTextColor="#75482f"
           multiline
           numberOfLines={4}
         />
@@ -207,9 +210,12 @@ const AddProductScreen = ({ navigation }) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color="#0e0b05" />
           ) : (
-            <Text style={styles.submitButtonText}>Add Product</Text>
+            <>
+              <Icon name="add-circle" size={20} color="#0e0b05" />
+              <Text style={styles.submitButtonText}>Add Product</Text>
+            </>
           )}
         </TouchableOpacity>
       </View>
@@ -230,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12,
-    color: '#333',
+    color: '#0e0b05',
   },
   input: {
     backgroundColor: '#fff',
@@ -238,8 +244,8 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
-    color: '#333',
+    borderColor: '#e0e0e0',
+    color: '#0e0b05',
   },
   textArea: {
     height: 100,
@@ -261,43 +267,57 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     marginRight: 8,
     marginBottom: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   categoryButtonText: {
-    color: '#666',
+    color: '#75482f',
   },
   categoryButtonTextActive: {
-    color: '#fff',
+    color: '#0e0b05',
+    fontWeight: '600',
   },
   statsContainer: {
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#fec82b10',
     padding: 12,
     borderRadius: 8,
     marginVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   statsText: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#fec82b',
     fontWeight: '600',
     marginVertical: 2,
+    marginRight: 12,
+  },
+  statsDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#fec82b30',
+    marginHorizontal: 8,
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 24,
     marginBottom: 40,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   submitButtonText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 18,
     fontWeight: '600',
+    marginLeft: 8,
   },
 });
 

@@ -10,7 +10,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const RestrictedScreen = ({ navigation, screenName }) => {
   return (
     <View style={styles.container}>
-      <Icon name="lock-closed" size={80} color="#999" />
+      <View style={styles.iconContainer}>
+        <Icon name="lock-closed" size={80} color="#fec82b" />
+      </View>
       <Text style={styles.title}>Access Restricted</Text>
       <Text style={styles.message}>
         The {screenName} section is only available for Administrator users.
@@ -19,6 +21,7 @@ const RestrictedScreen = ({ navigation, screenName }) => {
         style={styles.button}
         onPress={() => navigation.navigate('POS')}
       >
+        <Icon name="cart-outline" size={18} color="#0e0b05" />
         <Text style={styles.buttonText}>Go to POS</Text>
       </TouchableOpacity>
     </View>
@@ -33,30 +36,43 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     padding: 20,
   },
+  iconContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#fec82b20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 20,
+    color: '#0e0b05',
+    marginTop: 10,
     marginBottom: 10,
   },
   message: {
     fontSize: 16,
-    color: '#666',
+    color: '#75482f',
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 24,
+    paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8,
   },
 });
 

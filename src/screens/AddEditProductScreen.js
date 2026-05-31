@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { getDatabaseInstance, ref, push, set, update } from '../config/firebase';
 
 const categories = [
@@ -21,8 +22,8 @@ const AddEditProductScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: product?.name || '',
-    price: product?.price?.toString() || '',
-    cost: product?.cost?.toString() || '',
+    sellPrice: product?.sellPrice?.toString() || product?.price?.toString() || '',
+    buyPrice: product?.buyPrice?.toString() || product?.cost?.toString() || '',
     category: product?.category || '',
     quantity: product?.quantity?.toString() || '',
     description: product?.description || '',
@@ -35,14 +36,14 @@ const AddEditProductScreen = ({ route, navigation }) => {
   };
 
   const calculateProfit = () => {
-    const price = parseFloat(formData.price) || 0;
-    const cost = parseFloat(formData.cost) || 0;
+    const price = parseFloat(formData.sellPrice) || 0;
+    const cost = parseFloat(formData.buyPrice) || 0;
     return (price - cost).toFixed(2);
   };
 
   const calculateMargin = () => {
-    const price = parseFloat(formData.price) || 0;
-    const cost = parseFloat(formData.cost) || 0;
+    const price = parseFloat(formData.sellPrice) || 0;
+    const cost = parseFloat(formData.buyPrice) || 0;
     if (price === 0) return '0%';
     return `${((price - cost) / price * 100).toFixed(1)}%`;
   };
@@ -52,12 +53,12 @@ const AddEditProductScreen = ({ route, navigation }) => {
       Alert.alert('Error', 'Please enter product name');
       return false;
     }
-    if (!formData.price || parseFloat(formData.price) <= 0) {
-      Alert.alert('Error', 'Please enter a valid price');
+    if (!formData.sellPrice || parseFloat(formData.sellPrice) <= 0) {
+      Alert.alert('Error', 'Please enter a valid selling price');
       return false;
     }
-    if (!formData.cost || parseFloat(formData.cost) <= 0) {
-      Alert.alert('Error', 'Please enter a valid cost');
+    if (!formData.buyPrice || parseFloat(formData.buyPrice) <= 0) {
+      Alert.alert('Error', 'Please enter a valid cost price');
       return false;
     }
     if (!formData.category) {
@@ -75,8 +76,8 @@ const AddEditProductScreen = ({ route, navigation }) => {
       const db = getDatabaseInstance();
       const productData = {
         name: formData.name.trim(),
-        price: parseFloat(formData.price),
-        cost: parseFloat(formData.cost),
+        sellPrice: parseFloat(formData.sellPrice),
+        buyPrice: parseFloat(formData.buyPrice),
         category: formData.category,
         quantity: parseInt(formData.quantity) || 0,
         description: formData.description.trim(),
@@ -118,6 +119,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
           value={formData.name}
           onChangeText={(text) => handleInputChange('name', text)}
           placeholder="Enter product name"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>SKU</Text>
@@ -126,35 +128,45 @@ const AddEditProductScreen = ({ route, navigation }) => {
           value={formData.sku}
           onChangeText={(text) => handleInputChange('sku', text)}
           placeholder="Enter SKU"
+          placeholderTextColor="#75482f"
         />
 
         <View style={styles.row}>
           <View style={styles.halfWidth}>
-            <Text style={styles.label}>Price *</Text>
+            <Text style={styles.label}>Selling Price *</Text>
             <TextInput
               style={styles.input}
-              value={formData.price}
-              onChangeText={(text) => handleInputChange('price', text)}
+              value={formData.sellPrice}
+              onChangeText={(text) => handleInputChange('sellPrice', text)}
               placeholder="0.00"
               keyboardType="decimal-pad"
+              placeholderTextColor="#75482f"
             />
           </View>
           <View style={styles.halfWidth}>
-            <Text style={styles.label}>Cost *</Text>
+            <Text style={styles.label}>Cost Price *</Text>
             <TextInput
               style={styles.input}
-              value={formData.cost}
-              onChangeText={(text) => handleInputChange('cost', text)}
+              value={formData.buyPrice}
+              onChangeText={(text) => handleInputChange('buyPrice', text)}
               placeholder="0.00"
               keyboardType="decimal-pad"
+              placeholderTextColor="#75482f"
             />
           </View>
         </View>
 
-        {formData.price && formData.cost && (
+        {formData.sellPrice && formData.buyPrice && (
           <View style={styles.statsBox}>
-            <Text style={styles.statsText}>💰 Profit: ${calculateProfit()}</Text>
-            <Text style={styles.statsText}>📊 Margin: {calculateMargin()}</Text>
+            <View style={styles.statsRow}>
+              <Icon name="trending-up" size={16} color="#fec82b" />
+              <Text style={styles.statsText}> Profit: ${calculateProfit()}</Text>
+            </View>
+            <View style={styles.statsDivider} />
+            <View style={styles.statsRow}>
+              <Icon name="pie-chart" size={16} color="#fec82b" />
+              <Text style={styles.statsText}> Margin: {calculateMargin()}</Text>
+            </View>
           </View>
         )}
 
@@ -184,6 +196,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
           onChangeText={(text) => handleInputChange('quantity', text)}
           placeholder="0"
           keyboardType="numeric"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>Supplier</Text>
@@ -192,6 +205,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
           value={formData.supplier}
           onChangeText={(text) => handleInputChange('supplier', text)}
           placeholder="Enter supplier name"
+          placeholderTextColor="#75482f"
         />
 
         <Text style={styles.label}>Description</Text>
@@ -200,6 +214,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
           value={formData.description}
           onChangeText={(text) => handleInputChange('description', text)}
           placeholder="Enter product description"
+          placeholderTextColor="#75482f"
           multiline
           numberOfLines={4}
         />
@@ -210,11 +225,14 @@ const AddEditProductScreen = ({ route, navigation }) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color="#0e0b05" />
           ) : (
-            <Text style={styles.saveButtonText}>
-              {isEditing ? 'Update Product' : 'Add Product'}
-            </Text>
+            <>
+              <Icon name={isEditing ? "create" : "add-circle"} size={20} color="#0e0b05" />
+              <Text style={styles.saveButtonText}>
+                {isEditing ? 'Update Product' : 'Add Product'}
+              </Text>
+            </>
           )}
         </TouchableOpacity>
       </View>
@@ -235,7 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12,
-    color: '#333',
+    color: '#0e0b05',
   },
   input: {
     backgroundColor: '#fff',
@@ -243,7 +261,8 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0e0e0',
+    color: '#0e0b05',
   },
   textArea: {
     height: 100,
@@ -265,43 +284,59 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     marginRight: 8,
     marginBottom: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   categoryButtonText: {
-    color: '#666',
+    color: '#75482f',
   },
   categoryButtonTextActive: {
-    color: '#fff',
+    color: '#0e0b05',
+    fontWeight: '600',
   },
   statsBox: {
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#fec82b10',
     padding: 12,
     borderRadius: 8,
     marginVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statsDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#fec82b30',
   },
   statsText: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#fec82b',
     fontWeight: '600',
-    marginVertical: 2,
+    marginLeft: 4,
   },
   saveButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 24,
     marginBottom: 40,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 18,
     fontWeight: '600',
+    marginLeft: 8,
   },
 });
 

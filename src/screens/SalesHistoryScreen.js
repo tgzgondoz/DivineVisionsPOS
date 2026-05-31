@@ -120,7 +120,7 @@ const SalesHistoryScreen = () => {
       >
         <View style={styles.saleHeader}>
           <View style={styles.saleIdContainer}>
-
+            <Icon name="receipt-outline" size={14} color="#fec82b" />
             <Text style={styles.saleId}>#{item.id?.slice(-8)}</Text>
           </View>
           <Text style={styles.saleDate}>{moment(item.timestamp).format('MM/DD/YY h:mm A')}</Text>
@@ -128,11 +128,11 @@ const SalesHistoryScreen = () => {
         
         <View style={styles.saleDetails}>
           <View style={styles.customerInfo}>
-            <Icon name="person-outline" size={12} color="#666" />
+            <Icon name="person-outline" size={12} color="#75482f" />
             <Text style={styles.saleCustomer}>{item.customerName || 'Walk-in Customer'}</Text>
           </View>
           <View style={styles.itemsInfo}>
-            <Icon name="cube-outline" size={12} color="#666" />
+            <Icon name="cube-outline" size={12} color="#75482f" />
             <Text style={styles.saleItems}>{item.items?.length || 0} items</Text>
           </View>
         </View>
@@ -170,32 +170,32 @@ const SalesHistoryScreen = () => {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Sale Details</Text>
             <TouchableOpacity onPress={() => setSelectedSale(null)}>
-              <Icon name="close" size={24} color="#333" />
+              <Icon name="close" size={24} color="#75482f" />
             </TouchableOpacity>
           </View>
           
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.detailSection}>
               <View style={styles.detailIconRow}>
-                <Icon name="receipt-outline" size={16} color="#007AFF" />
+                <Icon name="receipt-outline" size={16} color="#fec82b" />
                 <Text style={styles.detailLabel}>Sale ID</Text>
               </View>
               <Text style={styles.detailValue}>{selectedSale?.id}</Text>
               
               <View style={styles.detailIconRow}>
-                <Icon name="calendar-outline" size={16} color="#007AFF" />
+                <Icon name="calendar-outline" size={16} color="#fec82b" />
                 <Text style={styles.detailLabel}>Date & Time</Text>
               </View>
               <Text style={styles.detailValue}>{moment(selectedSale?.timestamp).format('MMMM Do YYYY, h:mm:ss a')}</Text>
               
               <View style={styles.detailIconRow}>
-                <Icon name="person-outline" size={16} color="#007AFF" />
+                <Icon name="person-outline" size={16} color="#fec82b" />
                 <Text style={styles.detailLabel}>Customer</Text>
               </View>
               <Text style={styles.detailValue}>{selectedSale?.customerName || 'Walk-in Customer'}</Text>
               
               <View style={styles.detailIconRow}>
-                <Icon name="card-outline" size={16} color="#007AFF" />
+                <Icon name="card-outline" size={16} color="#fec82b" />
                 <Text style={styles.detailLabel}>Payment Method</Text>
               </View>
               <Text style={styles.detailValue}>{selectedSale?.paymentMethod?.toUpperCase()}</Text>
@@ -203,7 +203,7 @@ const SalesHistoryScreen = () => {
             
             <View style={styles.detailSection}>
               <View style={styles.sectionHeader}>
-                <Icon name="cube-outline" size={18} color="#007AFF" />
+                <Icon name="cube-outline" size={18} color="#fec82b" />
                 <Text style={styles.sectionTitle}>Items</Text>
               </View>
               {selectedSale?.items?.map((item, index) => {
@@ -261,7 +261,7 @@ const SalesHistoryScreen = () => {
     return (
       <View style={styles.centerContainer}>
         <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#fec82b" />
         <Text style={styles.loadingText}>Loading sales history...</Text>
       </View>
     );
@@ -278,36 +278,33 @@ const SalesHistoryScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
       
-      {/* Minimal Header */}
       <View style={styles.miniHeader}>
         <Text style={styles.miniHeaderTitle}>Sales</Text>
         <Text style={styles.miniHeaderDate}>{moment().format('MMM DD, YYYY')}</Text>
       </View>
 
-     {/* Stats Cards */}
-<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
-  <View style={styles.statCard}>
-    <Text style={styles.statValue}>{formatCurrency(totalRevenue)}</Text>
-    <Text style={styles.statLabel}>Revenue</Text>
-  </View>
-  
-  <View style={styles.statCard}>
-    <Text style={[styles.statValue, styles.profitColor]}>{formatCurrency(totalProfit)}</Text>
-    <Text style={styles.statLabel}>Profit</Text>
-  </View>
-  
-  <View style={styles.statCard}>
-    <Text style={styles.statValue}>{totalTransactions}</Text>
-    <Text style={styles.statLabel}>Sales</Text>
-  </View>
-  
-  <View style={styles.statCard}>
-    <Text style={styles.statValue}>{formatCurrency(averageOrder)}</Text>
-    <Text style={styles.statLabel}>Average</Text>
-  </View>
-</ScrollView>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{formatCurrency(totalRevenue)}</Text>
+          <Text style={styles.statLabel}>Revenue</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <Text style={[styles.statValue, styles.profitColor]}>{formatCurrency(totalProfit)}</Text>
+          <Text style={styles.statLabel}>Profit</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{totalTransactions}</Text>
+          <Text style={styles.statLabel}>Sales</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{formatCurrency(averageOrder)}</Text>
+          <Text style={styles.statLabel}>Average</Text>
+        </View>
+      </ScrollView>
 
-      {/* Filter Buttons */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
           style={[styles.filterButton, filter === 'today' && styles.filterButtonActive]}
@@ -335,9 +332,13 @@ const SalesHistoryScreen = () => {
         </TouchableOpacity>
       </View>
 
-     
+      {topProduct && (
+        <View style={styles.topProductBanner}>
+          <Icon name="trophy-outline" size={14} color="#fec82b" />
+          <Text style={styles.topProductText}>Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
+        </View>
+      )}
 
-      {/* Sales List */}
       <FlatList
         data={filteredSales}
         renderItem={renderSaleItem}
@@ -347,7 +348,7 @@ const SalesHistoryScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="receipt-outline" size={64} color="#ccc" />
+            <Icon name="receipt-outline" size={64} color="#75482f" />
             <Text style={styles.emptyText}>No sales found</Text>
             <Text style={styles.emptySubtext}>
               {filter === 'today' ? 'No sales today' : 
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 14,
-    color: '#666',
+    color: '#75482f',
   },
   miniHeader: {
     paddingHorizontal: 20,
@@ -392,39 +393,34 @@ const styles = StyleSheet.create({
   miniHeaderTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1a1a2e',
+    color: '#0e0b05',
   },
   miniHeaderDate: {
     fontSize: 13,
-    color: '#888',
+    color: '#75482f',
   },
   statsScroll: {
     paddingHorizontal: 12,
     marginBottom: 8,
   },
   statCard: {
-  paddingHorizontal: 18,
-  paddingVertical: 12,
-  marginHorizontal: 6,
-  minWidth: 110,
-  alignItems: 'center',
-  },
-  statIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#e8f4f8',
-    justifyContent: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    marginHorizontal: 6,
+    minWidth: 110,
     alignItems: 'center',
-    marginBottom: 6,
-  },
-  profitIcon: {
-    backgroundColor: '#e8f5e9',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 1,
+    shadowColor: '#0e0b05',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   statValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
     marginBottom: 2,
   },
   profitColor: {
@@ -432,7 +428,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#888',
+    color: '#75482f',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -448,18 +444,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   filterButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   filterText: {
-    color: '#666',
+    color: '#75482f',
     fontSize: 12,
     fontWeight: '500',
   },
   filterTextActive: {
-    color: '#fff',
+    color: '#0e0b05',
   },
   topProductBanner: {
-    backgroundColor: '#fff9e6',
+    backgroundColor: '#fec82b10',
     marginHorizontal: 16,
     marginBottom: 10,
     padding: 8,
@@ -467,11 +463,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ffe0b2',
+    borderColor: '#fec82b30',
   },
   topProductText: {
     fontSize: 11,
-    color: '#e67700',
+    color: '#fec82b',
     marginLeft: 8,
     fontWeight: '500',
   },
@@ -485,12 +481,14 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 14,
     elevation: 1,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 2,
     borderWidth: 1,
     borderColor: '#f0f0f0',
+    borderLeftWidth: 4,
+    borderLeftColor: '#fec82b',
   },
   saleHeader: {
     flexDirection: 'row',
@@ -504,12 +502,12 @@ const styles = StyleSheet.create({
   },
   saleId: {
     fontSize: 11,
-    color: '#999',
+    color: '#75482f',
     marginLeft: 4,
   },
   saleDate: {
     fontSize: 10,
-    color: '#aaa',
+    color: '#75482f',
   },
   saleDetails: {
     flexDirection: 'row',
@@ -527,12 +525,12 @@ const styles = StyleSheet.create({
   saleCustomer: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#333',
+    color: '#0e0b05',
     marginLeft: 4,
   },
   saleItems: {
     fontSize: 11,
-    color: '#666',
+    color: '#75482f',
     marginLeft: 4,
   },
   saleFooter: {
@@ -543,7 +541,7 @@ const styles = StyleSheet.create({
   saleTotal: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
   },
   saleProfit: {
     fontSize: 10,
@@ -562,7 +560,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4caf50',
   },
   cardBadge: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   mobileBadge: {
     backgroundColor: '#ff9800',
@@ -596,7 +594,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 19,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   detailSection: {
     padding: 14,
@@ -611,12 +609,12 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 11,
-    color: '#888',
+    color: '#75482f',
     marginLeft: 8,
   },
   detailValue: {
     fontSize: 13,
-    color: '#333',
+    color: '#0e0b05',
     marginBottom: 10,
     marginLeft: 24,
   },
@@ -628,7 +626,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
     marginLeft: 8,
   },
   detailItem: {
@@ -645,11 +643,11 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
   },
   itemPrice: {
     fontSize: 11,
-    color: '#666',
+    color: '#75482f',
     marginTop: 2,
   },
   itemProfit: {
@@ -660,7 +658,7 @@ const styles = StyleSheet.create({
   itemTotal: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
   },
   totalDetailRow: {
     flexDirection: 'row',
@@ -669,11 +667,11 @@ const styles = StyleSheet.create({
   },
   totalDetailLabel: {
     fontSize: 13,
-    color: '#666',
+    color: '#75482f',
   },
   totalDetailValue: {
     fontSize: 13,
-    color: '#333',
+    color: '#0e0b05',
   },
   grandTotalDetail: {
     marginTop: 6,
@@ -684,12 +682,12 @@ const styles = StyleSheet.create({
   grandTotalDetailLabel: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   grandTotalDetailValue: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
   },
   changeText: {
     color: '#4caf50',
@@ -705,7 +703,7 @@ const styles = StyleSheet.create({
   totalProfitLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
   },
   totalProfitValue: {
     fontSize: 14,
@@ -719,12 +717,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#999',
+    color: '#75482f',
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 12,
-    color: '#bbb',
+    color: '#bdc1c6',
     marginTop: 8,
     textAlign: 'center',
   },

@@ -55,7 +55,6 @@ const CategoryManagementScreen = () => {
         ...data[key]
       })) : [];
       
-      // Count products per category
       const counts = {};
       products.forEach(product => {
         if (product.category) {
@@ -72,7 +71,6 @@ const CategoryManagementScreen = () => {
       return;
     }
 
-    // Check for duplicate category name
     if (categories.some(cat => cat.name.toLowerCase() === categoryName.trim().toLowerCase())) {
       Alert.alert('Error', 'Category already exists');
       return;
@@ -110,7 +108,6 @@ const CategoryManagementScreen = () => {
       return;
     }
 
-    // Check for duplicate category name (excluding current category)
     if (categories.some(cat => cat.id !== editingCategory.id && 
         cat.name.toLowerCase() === categoryName.trim().toLowerCase())) {
       Alert.alert('Error', 'Category already exists');
@@ -158,7 +155,6 @@ const CategoryManagementScreen = () => {
               const categoryRef = ref(db, `categories/${category.id}`);
               await remove(categoryRef);
               
-              // Update products that use this category to 'Other'
               const productsRef = ref(db, 'products');
               onValue(productsRef, async (snapshot) => {
                 const data = snapshot.val();
@@ -204,7 +200,9 @@ const CategoryManagementScreen = () => {
   const renderCategoryItem = ({ item }) => (
     <View style={styles.categoryCard}>
       <View style={styles.categoryInfo}>
-       
+        <View style={styles.categoryIcon}>
+          <Icon name="folder" size={24} color="#fec82b" />
+        </View>
         <View style={styles.categoryDetails}>
           <Text style={styles.categoryName}>{item.name}</Text>
           {item.description ? (
@@ -237,7 +235,7 @@ const CategoryManagementScreen = () => {
     return (
       <View style={styles.centerContainer}>
         <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#fec82b" />
         <Text style={styles.loadingText}>Loading categories...</Text>
       </View>
     );
@@ -247,7 +245,6 @@ const CategoryManagementScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
       
-      {/* Add Category FAB */}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
@@ -255,7 +252,7 @@ const CategoryManagementScreen = () => {
           setModalVisible(true);
         }}
       >
-        <Icon name="add" size={30} color="#fff" />
+        <Icon name="add" size={30} color="#0e0b05" />
       </TouchableOpacity>
 
       <View style={styles.statsContainer}>
@@ -286,7 +283,7 @@ const CategoryManagementScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="folder-open" size={64} color="#ccc" />
+            <Icon name="folder-open" size={64} color="#75482f" />
             <Text style={styles.emptyText}>No categories found</Text>
             <Text style={styles.emptySubtext}>Tap + to add your first category</Text>
           </View>
@@ -307,7 +304,7 @@ const CategoryManagementScreen = () => {
                 {editingCategory ? 'Edit Category' : 'Add New Category'}
               </Text>
               <TouchableOpacity onPress={resetForm}>
-                <Icon name="close" size={24} color="#333" />
+                <Icon name="close" size={24} color="#75482f" />
               </TouchableOpacity>
             </View>
 
@@ -319,6 +316,7 @@ const CategoryManagementScreen = () => {
                 onChangeText={setCategoryName}
                 placeholder="Enter category name"
                 placeholderTextColor="#999"
+                placeholderTextColor="#75482f"
               />
 
               <Text style={styles.label}>Description (Optional)</Text>
@@ -327,7 +325,7 @@ const CategoryManagementScreen = () => {
                 value={categoryDescription}
                 onChangeText={setCategoryDescription}
                 placeholder="Enter category description"
-                placeholderTextColor="#999"
+                placeholderTextColor="#75482f"
                 multiline
                 numberOfLines={3}
               />
@@ -338,7 +336,7 @@ const CategoryManagementScreen = () => {
                 disabled={loading}
               >
                 {loading ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color="#0e0b05" />
                 ) : (
                   <Text style={styles.saveButtonText}>
                     {editingCategory ? 'Update Category' : 'Add Category'}
@@ -367,7 +365,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: '#75482f',
   },
   fab: {
     position: 'absolute',
@@ -376,11 +374,11 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -394,6 +392,8 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 2,
     marginTop: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   statCard: {
     flex: 1,
@@ -402,12 +402,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#fec82b',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#75482f',
   },
   listContainer: {
     padding: 16,
@@ -422,10 +422,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#fec82b',
   },
   categoryInfo: {
     flexDirection: 'row',
@@ -435,7 +437,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#fec82b20',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -446,17 +448,18 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
     marginBottom: 4,
   },
   categoryDescription: {
     fontSize: 13,
-    color: '#666',
+    color: '#75482f',
     marginBottom: 4,
   },
   productCount: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#fec82b',
+    fontWeight: '500',
   },
   categoryActions: {
     flexDirection: 'row',
@@ -470,7 +473,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editBtn: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
   },
   deleteBtn: {
     backgroundColor: '#ff4444',
@@ -498,7 +501,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   modalForm: {
     padding: 16,
@@ -508,7 +511,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12,
-    color: '#333',
+    color: '#0e0b05',
   },
   input: {
     backgroundColor: '#f8f8f8',
@@ -517,13 +520,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    color: '#0e0b05',
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
   },
   saveButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -531,7 +535,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#0e0b05',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -542,7 +546,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#999',
+    color: '#75482f',
     marginTop: 16,
   },
   emptySubtext: {

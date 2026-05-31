@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,21 +42,38 @@ const AppNavigator = ({ onLogout }) => {
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
-        headerStyle: {
-          backgroundColor: '#007AFF',
+        tabBarActiveTintColor: '#fec82b',
+        tabBarInactiveTintColor: '#75482f',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: '#e0e0e0',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
-        headerTintColor: '#fff',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+        },
+        headerStyle: {
+          backgroundColor: '#fec82b',
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e0e0e0',
+        },
+        headerTintColor: '#0e0b05',
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 18,
         },
+        headerTitleAlign: 'center',
         headerRight: () => (
           <TouchableOpacity 
             onPress={onLogout} 
             style={{ marginRight: 16 }}
           >
-            <Icon name="log-out" size={24} color="#fff" />
+            <Icon name="log-out" size={22} color="#0e0b05" />
           </TouchableOpacity>
         ),
       })}
@@ -67,7 +84,8 @@ const AppNavigator = ({ onLogout }) => {
         component={POSScreen}
         options={{ 
           title: 'Point of Sale',
-          headerShown: true 
+          headerShown: true,
+          tabBarLabel: 'POS',
         }}
       />
       
@@ -77,7 +95,8 @@ const AppNavigator = ({ onLogout }) => {
         component={isAdmin() ? ProductManagementScreen : RestrictedScreen}
         options={{ 
           title: 'Product Management',
-          headerShown: true 
+          headerShown: true,
+          tabBarLabel: 'Products',
         }}
         initialParams={{ screenName: 'Product Management' }}
       />
@@ -88,7 +107,8 @@ const AppNavigator = ({ onLogout }) => {
         component={isAdmin() ? CategoryManagementScreen : RestrictedScreen}
         options={{ 
           title: 'Category Management',
-          headerShown: true 
+          headerShown: true,
+          tabBarLabel: 'Categories',
         }}
         initialParams={{ screenName: 'Category Management' }}
       />
@@ -99,7 +119,8 @@ const AppNavigator = ({ onLogout }) => {
         component={SalesHistoryScreen}
         options={{ 
           title: 'Sales History',
-          headerShown: true 
+          headerShown: true,
+          tabBarLabel: 'Sales',
         }}
       />
       
@@ -109,7 +130,8 @@ const AppNavigator = ({ onLogout }) => {
         component={isAdmin() ? InventoryScreen : RestrictedScreen}
         options={{ 
           title: 'Inventory Dashboard',
-          headerShown: true 
+          headerShown: true,
+          tabBarLabel: 'Inventory',
         }}
         initialParams={{ screenName: 'Inventory Dashboard' }}
       />
