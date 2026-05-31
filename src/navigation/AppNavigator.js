@@ -10,11 +10,16 @@ import ProductManagementScreen from '../screens/ProductManagementScreen';
 import SalesHistoryScreen from '../screens/SalesHistoryScreen';
 import InventoryScreen from '../screens/InventoryScreen';
 import AdminDashboardScreen from '../screens/AdminDashboardScreen';
+import RestrictedScreen from '../screens/RestrictedScreen';
 
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = ({ onLogout }) => {
-  const { isAdmin } = useAuth();
+  const { user, isAdmin, isCashier } = useAuth();
+  
+  if (!user) {
+    return null;
+  }
 
   return (
     <Tab.Navigator
@@ -53,6 +58,7 @@ const AppNavigator = ({ onLogout }) => {
         ),
       })}
     >
+      {/* POS - Both roles can access */}
       <Tab.Screen 
         name="POS" 
         component={POSScreen}
@@ -61,14 +67,19 @@ const AppNavigator = ({ onLogout }) => {
           headerShown: true 
         }}
       />
+      
+      {/* Products - Only Admin, Cashier sees restricted message */}
       <Tab.Screen 
         name="Products" 
-        component={ProductManagementScreen}
+        component={isAdmin() ? ProductManagementScreen : RestrictedScreen}
         options={{ 
           title: 'Product Management',
           headerShown: true 
         }}
+        initialParams={{ screenName: 'Product Management' }}
       />
+      
+      {/* Sales - Both roles can access */}
       <Tab.Screen 
         name="Sales" 
         component={SalesHistoryScreen}
@@ -77,14 +88,19 @@ const AppNavigator = ({ onLogout }) => {
           headerShown: true 
         }}
       />
+      
+      {/* Inventory - Only Admin, Cashier sees restricted message */}
       <Tab.Screen 
         name="Inventory" 
-        component={InventoryScreen}
+        component={isAdmin() ? InventoryScreen : RestrictedScreen}
         options={{ 
           title: 'Inventory Dashboard',
           headerShown: true 
         }}
+        initialParams={{ screenName: 'Inventory Dashboard' }}
       />
+      
+      {/* Admin Panel - Only Admin */}
       {isAdmin() && (
         <Tab.Screen 
           name="Admin" 
@@ -92,15 +108,8 @@ const AppNavigator = ({ onLogout }) => {
           options={{ 
             title: 'Admin Panel',
             headerShown: true,
-            headerRight: () => (
-              <TouchableOpacity 
-                onPress={onLogout} 
-                style={{ marginRight: 16 }}
-              >
-                <Icon name="log-out" size={24} color="#fff" />
-              </TouchableOpacity>
-            ),
           }}
+          initialParams={{ user, onLogout }}
         />
       )}
     </Tab.Navigator>
