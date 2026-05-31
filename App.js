@@ -14,16 +14,16 @@ import LoginScreen from './src/screens/LoginScreen';
 import { initializeFirebase } from './src/config/firebase';
 import AuthService from './src/services/AuthService';
 
-// Initialize default admin and cashier users
+// Initialize default admin and cashier users with strong passwords for 2026
 const initializeDefaultUsers = async () => {
   try {
     const users = await AuthService.getUsers();
     if (users.length === 0) {
-      // Create default admin
-      await AuthService.registerUser('admin@divinevisions.com', 'admin123', 'System Admin', 'admin');
-      // Create default cashier
-      await AuthService.registerUser('cashier@divinevisions.com', 'cashier123', 'Default Cashier', 'cashier');
-      console.log('Default users created');
+      // Create default admin with strong password for 2026
+      await AuthService.registerUser('admin@gondopos.com', 'Gondo@Admin2026#Secure', 'System Administrator', 'admin');
+      // Create default cashier with strong password for 2026
+      await AuthService.registerUser('cashier@gondopos.com', 'Gondo@Cashier2026#Strong', 'Default Cashier', 'cashier');
+      console.log('Default users created successfully for 2026');
     }
   } catch (error) {
     console.error('Error initializing default users:', error);
@@ -75,7 +75,7 @@ const MainApp = () => {
       <SafeAreaProvider>
         <SafeAreaView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading DivineVisionsPOS...</Text>
+          <Text style={styles.loadingText}>Loading GondoPOS 2026...</Text>
         </SafeAreaView>
       </SafeAreaProvider>
     );

@@ -53,15 +53,15 @@ const LoginScreen = ({ onLogin }) => {
     }
   };
 
-  // Demo credentials for testing
+  // Demo credentials for testing with strong passwords for 2026
   const demoAdmin = () => {
-    setEmail('admin@divinevisions.com');
-    setPassword('admin123');
+    setEmail('admin@gondopos.com');
+    setPassword('Gondo@Admin2026#Secure');
   };
 
   const demoCashier = () => {
-    setEmail('cashier@divinevisions.com');
-    setPassword('cashier123');
+    setEmail('cashier@gondopos.com');
+    setPassword('Gondo@Cashier2026#Strong');
   };
 
   return (
@@ -72,7 +72,7 @@ const LoginScreen = ({ onLogin }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
           <Icon name="cart" size={80} color="#007AFF" />
-          <Text style={styles.title}>DivineVisions POS</Text>
+          <Text style={styles.title}>GondoPOS 2026</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
 
@@ -118,12 +118,12 @@ const LoginScreen = ({ onLogin }) => {
           </TouchableOpacity>
 
           <View style={styles.demoContainer}>
-            <Text style={styles.demoTitle}>Demo Credentials:</Text>
+            <Text style={styles.demoTitle}>Demo Credentials 2026:</Text>
             <TouchableOpacity onPress={demoAdmin} style={styles.demoButton}>
-              <Text style={styles.demoText}>Admin: admin@divinevisions.com / admin123</Text>
+              <Text style={styles.demoText}>Admin: admin@gondopos.com / Gondo@Admin2026#Secure</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={demoCashier} style={styles.demoButton}>
-              <Text style={styles.demoText}>Cashier: cashier@divinevisions.com / cashier123</Text>
+              <Text style={styles.demoText}>Cashier: cashier@gondopos.com / Gondo@Cashier2026#Strong</Text>
             </TouchableOpacity>
           </View>
         </View>
