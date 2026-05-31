@@ -10,7 +10,8 @@ import {
   Modal,
   ScrollView,
   ActivityIndicator,
-  RefreshControl
+  RefreshControl,
+  StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { getDatabaseInstance, ref, onValue, update, push, set, remove } from '../config/firebase';
@@ -263,39 +264,6 @@ const ProductManagementScreen = () => {
     setModalVisible(true);
   };
 
-  const handleRestock = (product) => {
-    Alert.alert(
-      'Restock Product',
-      `Enter quantity to add to ${product.name}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Restock',
-          onPress: async (quantity) => {
-            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
-              try {
-                const db = getDatabaseInstance();
-                const productRef = ref(db, `products/${product.id}`);
-                const newQuantity = (product.quantity || 0) + parseInt(quantity);
-                await update(productRef, { 
-                  quantity: newQuantity,
-                  updatedAt: new Date().toISOString()
-                });
-                Alert.alert('Success', `Added ${quantity} units to ${product.name}`);
-                loadProducts();
-              } catch (error) {
-                Alert.alert('Error', 'Failed to update inventory');
-              }
-            } else {
-              Alert.alert('Error', 'Please enter a valid quantity');
-            }
-          }
-        }
-      ],
-      'plain-text'
-    );
-  };
-
   const resetForm = () => {
     setEditingProduct(null);
     setFormData({
@@ -365,14 +333,6 @@ const ProductManagementScreen = () => {
 
         <View style={styles.productActions}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.restockButton]}
-            onPress={() => handleRestock(item)}
-          >
-            <Icon name="add-circle" size={20} color="#fff" />
-            <Text style={styles.actionButtonText}>Restock</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
             style={[styles.actionButton, styles.editButton]}
             onPress={() => handleEdit(item)}
           >
@@ -409,6 +369,7 @@ const ProductManagementScreen = () => {
   if (loading && products.length === 0) {
     return (
       <View style={styles.centerContainer}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
         <ActivityIndicator size="large" color="#007AFF" />
         <Text style={styles.loadingText}>Loading products...</Text>
       </View>
@@ -417,19 +378,20 @@ const ProductManagementScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Product Management</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            resetForm();
-            setModalVisible(true);
-          }}
-        >
-          <Icon name="add-circle" size={32} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      
+      {/* Add Product FAB */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => {
+          resetForm();
+          setModalVisible(true);
+        }}
+      >
+        <Icon name="add" size={30} color="#fff" />
+      </TouchableOpacity>
 
+      {/* Stats Cards */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
         <View style={styles.statCard}>
           <Text style={styles.statValue}>{stats.totalProducts}</Text>
@@ -453,6 +415,7 @@ const ProductManagementScreen = () => {
         </View>
       </ScrollView>
 
+      {/* Search and Filters */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
@@ -545,6 +508,7 @@ const ProductManagementScreen = () => {
         contentContainerStyle={styles.listContainer}
       />
 
+      {/* Add/Edit Product Modal */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -716,28 +680,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  header: {
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#007AFF',
-    padding: 16,
-    paddingTop: 40,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  addButton: {
-    padding: 4,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 100,
   },
   statsScroll: {
     backgroundColor: '#fff',
     paddingVertical: 16,
     paddingHorizontal: 8,
+    marginTop: 8,
   },
   statCard: {
     backgroundColor: '#f8f8f8',
@@ -976,19 +940,17 @@ const styles = StyleSheet.create({
   },
   productActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 12,
   },
   actionButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 8,
     marginHorizontal: 4,
-  },
-  restockButton: {
-    backgroundColor: '#4caf50',
   },
   editButton: {
     backgroundColor: '#007AFF',
@@ -998,8 +960,9 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 12,
-    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
