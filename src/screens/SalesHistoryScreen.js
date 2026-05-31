@@ -119,23 +119,11 @@ const SalesHistoryScreen = () => {
         activeOpacity={0.7}
       >
         <View style={styles.saleHeader}>
-          <View style={styles.saleIdContainer}>
-            <Icon name="receipt-outline" size={14} color="#fec82b" />
-            <Text style={styles.saleId}>#{item.id?.slice(-8)}</Text>
-          </View>
+          <Text style={styles.saleId}>#{item.id?.slice(-8)}</Text>
           <Text style={styles.saleDate}>{moment(item.timestamp).format('MM/DD/YY h:mm A')}</Text>
         </View>
         
-        <View style={styles.saleDetails}>
-          <View style={styles.customerInfo}>
-            <Icon name="person-outline" size={12} color="#75482f" />
-            <Text style={styles.saleCustomer}>{item.customerName || 'Walk-in Customer'}</Text>
-          </View>
-          <View style={styles.itemsInfo}>
-            <Icon name="cube-outline" size={12} color="#75482f" />
-            <Text style={styles.saleItems}>{item.items?.length || 0} items</Text>
-          </View>
-        </View>
+        <Text style={styles.saleCustomer}>{item.customerName || 'Walk-in Customer'}</Text>
         
         <View style={styles.saleFooter}>
           <View>
@@ -147,10 +135,6 @@ const SalesHistoryScreen = () => {
             item.paymentMethod === 'card' && styles.cardBadge,
             item.paymentMethod === 'mobile' && styles.mobileBadge
           ]}>
-            <Icon name={
-              item.paymentMethod === 'cash' ? 'cash-outline' :
-              item.paymentMethod === 'card' ? 'card-outline' : 'phone-portrait-outline'
-            } size={10} color="#fff" />
             <Text style={styles.paymentText}>{item.paymentMethod?.toUpperCase()}</Text>
           </View>
         </View>
@@ -176,36 +160,21 @@ const SalesHistoryScreen = () => {
           
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.detailSection}>
-              <View style={styles.detailIconRow}>
-                <Icon name="receipt-outline" size={16} color="#fec82b" />
-                <Text style={styles.detailLabel}>Sale ID</Text>
-              </View>
+              <Text style={styles.detailLabel}>Sale ID</Text>
               <Text style={styles.detailValue}>{selectedSale?.id}</Text>
               
-              <View style={styles.detailIconRow}>
-                <Icon name="calendar-outline" size={16} color="#fec82b" />
-                <Text style={styles.detailLabel}>Date & Time</Text>
-              </View>
+              <Text style={styles.detailLabel}>Date & Time</Text>
               <Text style={styles.detailValue}>{moment(selectedSale?.timestamp).format('MMMM Do YYYY, h:mm:ss a')}</Text>
               
-              <View style={styles.detailIconRow}>
-                <Icon name="person-outline" size={16} color="#fec82b" />
-                <Text style={styles.detailLabel}>Customer</Text>
-              </View>
+              <Text style={styles.detailLabel}>Customer</Text>
               <Text style={styles.detailValue}>{selectedSale?.customerName || 'Walk-in Customer'}</Text>
               
-              <View style={styles.detailIconRow}>
-                <Icon name="card-outline" size={16} color="#fec82b" />
-                <Text style={styles.detailLabel}>Payment Method</Text>
-              </View>
+              <Text style={styles.detailLabel}>Payment Method</Text>
               <Text style={styles.detailValue}>{selectedSale?.paymentMethod?.toUpperCase()}</Text>
             </View>
             
             <View style={styles.detailSection}>
-              <View style={styles.sectionHeader}>
-                <Icon name="cube-outline" size={18} color="#fec82b" />
-                <Text style={styles.sectionTitle}>Items</Text>
-              </View>
+              <Text style={styles.sectionTitle}>Items</Text>
               {selectedSale?.items?.map((item, index) => {
                 const profit = (item.sellPrice - item.buyPrice) * item.quantity;
                 return (
@@ -334,8 +303,7 @@ const SalesHistoryScreen = () => {
 
       {topProduct && (
         <View style={styles.topProductBanner}>
-          <Icon name="trophy-outline" size={14} color="#fec82b" />
-          <Text style={styles.topProductText}>Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
+          <Text style={styles.topProductText}>🏆 Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
         </View>
       )}
 
@@ -369,18 +337,18 @@ const SalesHistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
   },
   loadingText: {
     marginTop: 16,
     fontSize: 14,
-    color: '#75482f',
+    color: '#666',
   },
   miniHeader: {
     paddingHorizontal: 20,
@@ -404,15 +372,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statCard: {
+    backgroundColor: '#fff',
     paddingHorizontal: 18,
     paddingVertical: 12,
     marginHorizontal: 6,
     minWidth: 110,
     alignItems: 'center',
-    backgroundColor: '#fff',
     borderRadius: 12,
-    elevation: 1,
-    shadowColor: '#0e0b05',
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -428,7 +396,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#75482f',
+    color: '#666',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -447,7 +415,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fec82b',
   },
   filterText: {
-    color: '#75482f',
+    color: '#666',
     fontSize: 12,
     fontWeight: '500',
   },
@@ -460,7 +428,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 8,
     borderRadius: 10,
-    flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#fec82b30',
@@ -468,7 +435,6 @@ const styles = StyleSheet.create({
   topProductText: {
     fontSize: 11,
     color: '#fec82b',
-    marginLeft: 8,
     fontWeight: '500',
   },
   listContainer: {
@@ -479,16 +445,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 10,
     padding: 14,
-    borderRadius: 14,
-    elevation: 1,
-    shadowColor: '#0e0b05',
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    borderLeftWidth: 4,
-    borderLeftColor: '#fec82b',
   },
   saleHeader: {
     flexDirection: 'row',
@@ -496,42 +458,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  saleIdContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   saleId: {
     fontSize: 11,
-    color: '#75482f',
-    marginLeft: 4,
+    color: '#999',
   },
   saleDate: {
     fontSize: 10,
-    color: '#75482f',
-  },
-  saleDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  customerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemsInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    color: '#999',
   },
   saleCustomer: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#0e0b05',
-    marginLeft: 4,
-  },
-  saleItems: {
-    fontSize: 11,
-    color: '#75482f',
-    marginLeft: 4,
+    color: '#333',
+    marginBottom: 10,
   },
   saleFooter: {
     flexDirection: 'row',
@@ -549,12 +488,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   paymentBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 16,
-    gap: 3,
   },
   cashBadge: {
     backgroundColor: '#4caf50',
@@ -569,7 +505,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#fff',
     fontWeight: '600',
-    marginLeft: 3,
   },
   modalContainer: {
     flex: 1,
@@ -594,40 +529,29 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 19,
     fontWeight: 'bold',
-    color: '#0e0b05',
+    color: '#333',
   },
   detailSection: {
     padding: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#f5f5f5',
   },
-  detailIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  detailLabel: {
+    fontSize: 11,
+    color: '#666',
     marginBottom: 3,
     marginTop: 6,
   },
-  detailLabel: {
-    fontSize: 11,
-    color: '#75482f',
-    marginLeft: 8,
-  },
   detailValue: {
     fontSize: 13,
-    color: '#0e0b05',
-    marginBottom: 10,
-    marginLeft: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    color: '#333',
     marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#0e0b05',
-    marginLeft: 8,
+    color: '#333',
+    marginBottom: 10,
   },
   detailItem: {
     flexDirection: 'row',
@@ -643,11 +567,11 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0e0b05',
+    color: '#333',
   },
   itemPrice: {
     fontSize: 11,
-    color: '#75482f',
+    color: '#666',
     marginTop: 2,
   },
   itemProfit: {
@@ -667,11 +591,11 @@ const styles = StyleSheet.create({
   },
   totalDetailLabel: {
     fontSize: 13,
-    color: '#75482f',
+    color: '#666',
   },
   totalDetailValue: {
     fontSize: 13,
-    color: '#0e0b05',
+    color: '#333',
   },
   grandTotalDetail: {
     marginTop: 6,
@@ -682,7 +606,7 @@ const styles = StyleSheet.create({
   grandTotalDetailLabel: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#0e0b05',
+    color: '#333',
   },
   grandTotalDetailValue: {
     fontSize: 15,
@@ -703,7 +627,7 @@ const styles = StyleSheet.create({
   totalProfitLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0e0b05',
+    color: '#333',
   },
   totalProfitValue: {
     fontSize: 14,
@@ -717,12 +641,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#75482f',
+    color: '#999',
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 12,
-    color: '#bdc1c6',
+    color: '#bbb',
     marginTop: 8,
     textAlign: 'center',
   },

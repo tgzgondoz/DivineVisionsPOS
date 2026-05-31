@@ -56,7 +56,7 @@ const AppNavigator = ({ onLogout }) => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor: '#fec82b',
+          backgroundColor: '#fff',
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,

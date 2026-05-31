@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#75482f',
+    color: '#666',
     textAlign: 'center',
   },
   warning: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   listHeaderSubtitle: {
     fontSize: 14,
-    color: '#75482f',
+    color: '#666',
     marginTop: 4,
   },
   inventoryItem: {
@@ -295,12 +295,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#0e0b05',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#fec82b',
   },
   itemInfo: {
     flex: 1,
@@ -308,12 +306,12 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0e0b05',
+    color: '#333',
     marginBottom: 4,
   },
   itemSku: {
     fontSize: 12,
-    color: '#75482f',
+    color: '#999',
     marginBottom: 2,
   },
   itemCategory: {
@@ -324,7 +322,7 @@ const styles = StyleSheet.create({
   },
   itemPriceInfo: {
     fontSize: 11,
-    color: '#75482f',
+    color: '#666',
   },
   itemStatus: {
     alignItems: 'flex-end',
@@ -341,7 +339,7 @@ const styles = StyleSheet.create({
   },
   itemValue: {
     fontSize: 12,
-    color: '#75482f',
+    color: '#666',
     marginBottom: 2,
   },
   itemProfit: {
@@ -356,7 +354,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#75482f',
+    color: '#999',
   },
   emptySubtext: {
     fontSize: 14,

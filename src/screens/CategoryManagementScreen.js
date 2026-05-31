@@ -200,9 +200,6 @@ const CategoryManagementScreen = () => {
   const renderCategoryItem = ({ item }) => (
     <View style={styles.categoryCard}>
       <View style={styles.categoryInfo}>
-        <View style={styles.categoryIcon}>
-          <Icon name="folder" size={24} color="#fec82b" />
-        </View>
         <View style={styles.categoryDetails}>
           <Text style={styles.categoryName}>{item.name}</Text>
           {item.description ? (
@@ -219,13 +216,13 @@ const CategoryManagementScreen = () => {
           style={[styles.actionBtn, styles.editBtn]}
           onPress={() => handleEditCategory(item)}
         >
-          <Icon name="create" size={18} color="#fff" />
+          <Text style={styles.actionBtnText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionBtn, styles.deleteBtn]}
           onPress={() => handleDeleteCategory(item)}
         >
-          <Icon name="trash-bin" size={18} color="#fff" />
+          <Text style={styles.actionBtnText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -252,7 +249,7 @@ const CategoryManagementScreen = () => {
           setModalVisible(true);
         }}
       >
-        <Icon name="add" size={30} color="#0e0b05" />
+        <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
       <View style={styles.statsContainer}>
@@ -316,7 +313,6 @@ const CategoryManagementScreen = () => {
                 onChangeText={setCategoryName}
                 placeholder="Enter category name"
                 placeholderTextColor="#999"
-                placeholderTextColor="#75482f"
               />
 
               <Text style={styles.label}>Description (Optional)</Text>
@@ -325,7 +321,7 @@ const CategoryManagementScreen = () => {
                 value={categoryDescription}
                 onChangeText={setCategoryDescription}
                 placeholder="Enter category description"
-                placeholderTextColor="#75482f"
+                placeholderTextColor="#999"
                 multiline
                 numberOfLines={3}
               />
@@ -365,7 +361,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#75482f',
+    color: '#666',
   },
   fab: {
     position: 'absolute',
@@ -378,11 +374,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    shadowColor: '#0e0b05',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     zIndex: 100,
+  },
+  fabText: {
+    fontSize: 32,
+    color: '#0e0b05',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -392,8 +392,6 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 2,
     marginTop: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
   statCard: {
     flex: 1,
@@ -407,7 +405,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#75482f',
+    color: '#666',
   },
   listContainer: {
     padding: 16,
@@ -422,25 +420,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#0e0b05',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#fec82b',
   },
   categoryInfo: {
-    flexDirection: 'row',
     flex: 1,
-  },
-  categoryIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#fec82b20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
   },
   categoryDetails: {
     flex: 1,
@@ -448,28 +434,25 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#0e0b05',
+    color: '#333',
     marginBottom: 4,
   },
   categoryDescription: {
     fontSize: 13,
-    color: '#75482f',
+    color: '#666',
     marginBottom: 4,
   },
   productCount: {
     fontSize: 12,
     color: '#fec82b',
-    fontWeight: '500',
   },
   categoryActions: {
     flexDirection: 'row',
   },
   actionBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
     marginLeft: 8,
   },
   editBtn: {
@@ -477,6 +460,11 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     backgroundColor: '#ff4444',
+  },
+  actionBtnText: {
+    color: '#0e0b05',
+    fontWeight: '600',
+    fontSize: 12,
   },
   modalOverlay: {
     flex: 1,
@@ -501,7 +489,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0e0b05',
+    color: '#333',
   },
   modalForm: {
     padding: 16,
@@ -511,7 +499,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12,
-    color: '#0e0b05',
+    color: '#333',
   },
   input: {
     backgroundColor: '#f8f8f8',
@@ -519,8 +507,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    color: '#0e0b05',
+    borderColor: '#ddd',
   },
   textArea: {
     height: 80,
@@ -546,7 +533,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#75482f',
+    color: '#999',
     marginTop: 16,
   },
   emptySubtext: {

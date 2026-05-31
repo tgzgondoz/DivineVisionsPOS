@@ -279,10 +279,10 @@ const ProductManagementScreen = () => {
   };
 
   const getStockStatus = (quantity) => {
-    if (quantity <= 0) return { label: 'Out of Stock', color: '#ff4444', icon: 'close-circle' };
-    if (quantity < 10) return { label: 'Low Stock', color: '#ff8800', icon: 'alert-circle' };
-    if (quantity < 50) return { label: 'In Stock', color: '#fec82b', icon: 'checkmark-circle' };
-    return { label: 'Well Stocked', color: '#4caf50', icon: 'happy' };
+    if (quantity <= 0) return { label: 'Out of Stock', color: '#ff4444' };
+    if (quantity < 10) return { label: 'Low Stock', color: '#ff8800' };
+    if (quantity < 50) return { label: 'In Stock', color: '#4caf50' };
+    return { label: 'Well Stocked', color: '#4caf50' };
   };
 
   const formatCurrency = (amount) => {
@@ -292,61 +292,45 @@ const ProductManagementScreen = () => {
   const renderProduct = ({ item }) => {
     const stockStatus = getStockStatus(item.quantity);
     const profit = (item.sellPrice || 0) - (item.buyPrice || 0);
-    const margin = item.sellPrice ? (profit / item.sellPrice * 100).toFixed(1) : 0;
     
     return (
       <View style={styles.productCard}>
         <View style={styles.productHeader}>
-          <View style={styles.productTitleContainer}>
-            <Icon name="cube" size={18} color="#fec82b" />
-            <Text style={styles.productName}>{item.name}</Text>
-            <View style={[styles.stockBadge, { backgroundColor: stockStatus.color + '20' }]}>
-              <Icon name={stockStatus.icon} size={12} color={stockStatus.color} />
-              <Text style={[styles.stockBadgeText, { color: stockStatus.color }]}>
-                {stockStatus.label}
-              </Text>
-            </View>
-          </View>
-          {item.sku && <Text style={styles.productSku}>SKU: {item.sku}</Text>}
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={[styles.stockStatus, { color: stockStatus.color }]}>
+            {stockStatus.label}
+          </Text>
         </View>
-
+        
+        <Text style={styles.productSku}>SKU: {item.sku || 'N/A'}</Text>
+        
         <View style={styles.productDetails}>
-          <View style={styles.priceSection}>
-            <Text style={styles.priceLabel}>Sell Price</Text>
+          <View>
+            <Text style={styles.priceLabel}>Price</Text>
             <Text style={styles.productPrice}>{formatCurrency(item.sellPrice)}</Text>
-            <Text style={styles.buyPriceLabel}>Cost: {formatCurrency(item.buyPrice)}</Text>
+            <Text style={styles.costText}>Cost: {formatCurrency(item.buyPrice)}</Text>
           </View>
           
-          <View style={styles.profitSection}>
-            <Text style={styles.profitLabel}>Profit</Text>
-            <Text style={styles.productProfit}>{formatCurrency(profit)}</Text>
-            <Text style={styles.marginLabel}>Margin: {margin}%</Text>
-          </View>
-          
-          <View style={styles.stockSection}>
-            <Text style={styles.stockLabel}>Stock</Text>
-            <Text style={styles.productStock}>{item.quantity || 0} units</Text>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{item.category || 'Uncategorized'}</Text>
-            </View>
+          <View style={styles.rightDetails}>
+            <Text style={styles.quantityLabel}>Quantity</Text>
+            <Text style={styles.productQuantity}>{item.quantity || 0}</Text>
+            <Text style={styles.profitText}>Profit: {formatCurrency(profit)}</Text>
           </View>
         </View>
-
+        
         <View style={styles.productActions}>
           <TouchableOpacity
             style={[styles.actionButton, styles.editButton]}
             onPress={() => handleEdit(item)}
           >
-            <Icon name="create" size={18} color="#0e0b05" />
-            <Text style={styles.editButtonText}>Edit</Text>
+            <Text style={styles.buttonText}>Edit</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleDelete(item)}
           >
-            <Icon name="trash-bin" size={18} color="#fff" />
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            <Text style={styles.buttonText}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -388,23 +372,23 @@ const ProductManagementScreen = () => {
             <Text style={styles.statValue}>{stats.totalProducts}</Text>
             <Text style={styles.statLabel}>Products</Text>
           </View>
-          <View style={[styles.statCard, styles.profitCard]}>
-            <Text style={[styles.statValue, styles.profitText]}>{formatCurrency(stats.totalInventoryValue)}</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{formatCurrency(stats.totalInventoryValue)}</Text>
             <Text style={styles.statLabel}>Inventory Value</Text>
           </View>
-          <View style={[styles.statCard, styles.profitCard]}>
-            <Text style={[styles.statValue, styles.profitText]}>{formatCurrency(stats.totalPotentialRevenue)}</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{formatCurrency(stats.totalPotentialRevenue)}</Text>
             <Text style={styles.statLabel}>Revenue Potential</Text>
           </View>
-          <View style={[styles.statCard, styles.profitCard]}>
-            <Text style={[styles.statValue, styles.profitText]}>{formatCurrency(stats.totalPotentialProfit)}</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{formatCurrency(stats.totalPotentialProfit)}</Text>
             <Text style={styles.statLabel}>Profit Potential</Text>
           </View>
-          <View style={[styles.statCard, styles.warningCard]}>
+          <View style={styles.statCard}>
             <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
             <Text style={styles.statLabel}>Low Stock</Text>
           </View>
-          <View style={[styles.statCard, styles.dangerCard]}>
+          <View style={styles.statCard}>
             <Text style={[styles.statValue, styles.dangerText]}>{stats.outOfStockCount}</Text>
             <Text style={styles.statLabel}>Out of Stock</Text>
           </View>
@@ -419,32 +403,23 @@ const ProductManagementScreen = () => {
           setModalVisible(true);
         }}
       >
-        <Icon name="add" size={28} color="#0e0b05" />
+        <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
       {/* Search and Filters */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Icon name="search" size={18} color="#75482f" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by name or SKU..."
-            placeholderTextColor="#75482f"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery !== '' && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Icon name="close-circle" size={18} color="#75482f" />
-            </TouchableOpacity>
-          )}
-        </View>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔍 Search products..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
         
         <TouchableOpacity 
           style={styles.filterToggle}
           onPress={() => setShowFilters(!showFilters)}
         >
-          <Icon name="options" size={18} color="#fec82b" />
           <Text style={styles.filterToggleText}>Filters & Sort</Text>
         </TouchableOpacity>
       </View>
@@ -505,7 +480,6 @@ const ProductManagementScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="cube-outline" size={50} color="#75482f" />
             <Text style={styles.emptyText}>No products found</Text>
             <Text style={styles.emptySubtext}>
               {searchQuery ? 'Try a different search term' : 'Tap + to add your first product'}
@@ -538,7 +512,7 @@ const ProductManagementScreen = () => {
               value={formData.name}
               onChangeText={(text) => handleInputChange('name', text)}
               placeholder="Enter product name"
-              placeholderTextColor="#75482f"
+              placeholderTextColor="#999"
             />
 
             <Text style={styles.label}>SKU (Stock Keeping Unit)</Text>
@@ -547,7 +521,7 @@ const ProductManagementScreen = () => {
               value={formData.sku}
               onChangeText={(text) => handleInputChange('sku', text)}
               placeholder="Enter unique SKU (optional)"
-              placeholderTextColor="#75482f"
+              placeholderTextColor="#999"
             />
 
             <View style={styles.row}>
@@ -559,7 +533,7 @@ const ProductManagementScreen = () => {
                   onChangeText={(text) => handleInputChange('buyPrice', text)}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
-                  placeholderTextColor="#75482f"
+                  placeholderTextColor="#999"
                 />
               </View>
               <View style={styles.halfWidth}>
@@ -570,28 +544,16 @@ const ProductManagementScreen = () => {
                   onChangeText={(text) => handleInputChange('sellPrice', text)}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
-                  placeholderTextColor="#75482f"
+                  placeholderTextColor="#999"
                 />
               </View>
             </View>
 
             {formData.buyPrice && formData.sellPrice && (
               <View style={styles.statsBox}>
-                <View style={styles.statsRow}>
-                  <Icon name="trending-up" size={14} color="#fec82b" />
-                  <Text style={styles.statsLabel}>Profit per unit:</Text>
-                  <Text style={[styles.statsValue, styles.profitText]}>${calculateProfit()}</Text>
-                </View>
-                <View style={styles.statsRow}>
-                  <Icon name="pie-chart" size={14} color="#fec82b" />
-                  <Text style={styles.statsLabel}>Profit Margin:</Text>
-                  <Text style={[styles.statsValue, styles.profitText]}>{calculateMargin()}</Text>
-                </View>
-                <View style={styles.statsRow}>
-                  <Icon name="analytics" size={14} color="#fec82b" />
-                  <Text style={styles.statsLabel}>ROI:</Text>
-                  <Text style={[styles.statsValue, styles.profitText]}>{calculateROI()}</Text>
-                </View>
+                <Text style={styles.statsText}>Profit: ${calculateProfit()}</Text>
+                <Text style={styles.statsText}>Margin: {calculateMargin()}</Text>
+                <Text style={styles.statsText}>ROI: {calculateROI()}</Text>
               </View>
             )}
 
@@ -621,7 +583,7 @@ const ProductManagementScreen = () => {
                   value={customCategory}
                   onChangeText={setCustomCategory}
                   placeholder="Enter custom category"
-                  placeholderTextColor="#75482f"
+                  placeholderTextColor="#999"
                   autoFocus
                 />
                 <TouchableOpacity
@@ -639,7 +601,7 @@ const ProductManagementScreen = () => {
                   Custom: {formData.category}
                 </Text>
                 <TouchableOpacity onPress={() => setFormData({ ...formData, category: '' })}>
-                  <Icon name="close" size={16} color="#75482f" />
+                  <Icon name="close" size={16} color="#666" />
                 </TouchableOpacity>
               </View>
             )}
@@ -651,7 +613,7 @@ const ProductManagementScreen = () => {
               onChangeText={(text) => handleInputChange('quantity', text)}
               placeholder="0"
               keyboardType="numeric"
-              placeholderTextColor="#75482f"
+              placeholderTextColor="#999"
             />
 
             <TouchableOpacity
@@ -660,7 +622,7 @@ const ProductManagementScreen = () => {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#0e0b05" />
+                <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.saveButtonText}>
                   {editingProduct ? 'Update Product' : 'Add Product'}
@@ -677,51 +639,42 @@ const ProductManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
   },
   loadingText: {
     marginTop: 16,
     fontSize: 14,
-    color: '#75482f',
+    color: '#666',
   },
   statsScroll: {
     backgroundColor: '#fff',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e8ecef',
+    borderBottomColor: '#e0e0e0',
   },
   statsScrollContent: {
     paddingHorizontal: 12,
     flexDirection: 'row',
   },
   statCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 12,
     marginHorizontal: 6,
     minWidth: 110,
     alignItems: 'center',
-    shadowColor: '#0e0b05',
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 1,
-  },
-  profitCard: {
-    backgroundColor: '#fec82b10',
-  },
-  warningCard: {
-    backgroundColor: '#fff3e0',
-  },
-  dangerCard: {
-    backgroundColor: '#ffebee',
   },
   statValue: {
     fontSize: 20,
@@ -729,18 +682,15 @@ const styles = StyleSheet.create({
     color: '#fec82b',
     marginBottom: 4,
   },
-  profitText: {
-    color: '#fec82b',
-  },
   warningText: {
-    color: '#ed6c02',
+    color: '#ff8800',
   },
   dangerText: {
-    color: '#d32f2f',
+    color: '#ff4444',
   },
   statLabel: {
     fontSize: 11,
-    color: '#75482f',
+    color: '#666',
     fontWeight: '500',
   },
   fab: {
@@ -753,44 +703,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#fec82b',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 6,
-    shadowColor: '#0e0b05',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
     shadowRadius: 4,
     zIndex: 100,
   },
-  searchContainer: {
-    backgroundColor: '#fff',
-    padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e8ecef',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f1f3f4',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    marginBottom: 10,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 12,
-    fontSize: 15,
+  fabText: {
+    fontSize: 32,
     color: '#0e0b05',
   },
+  searchContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  searchInput: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 10,
+  },
   filterToggle: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 8,
   },
   filterToggleText: {
-    marginLeft: 8,
     color: '#fec82b',
     fontSize: 14,
     fontWeight: '500',
@@ -799,12 +740,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e8ecef',
+    borderBottomColor: '#e0e0e0',
   },
   filterTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0e0b05',
+    color: '#333',
     marginBottom: 8,
     marginTop: 4,
   },
@@ -816,14 +757,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f1f3f4',
+    backgroundColor: '#f0f0f0',
     marginRight: 8,
   },
   categoryChipActive: {
     backgroundColor: '#fec82b',
   },
   categoryChipText: {
-    color: '#75482f',
+    color: '#666',
     fontSize: 13,
     fontWeight: '500',
   },
@@ -839,14 +780,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: '#f1f3f4',
+    backgroundColor: '#f0f0f0',
     marginHorizontal: 4,
   },
   sortButtonActive: {
     backgroundColor: '#fec82b',
   },
   sortButtonText: {
-    color: '#75482f',
+    color: '#666',
     fontSize: 12,
     fontWeight: '500',
   },
@@ -858,156 +799,92 @@ const styles = StyleSheet.create({
   },
   productCard: {
     backgroundColor: '#fff',
-    margin: 12,
+    margin: 16,
     padding: 16,
-    borderRadius: 16,
-    shadowColor: '#0e0b05',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
+    borderRadius: 12,
     elevation: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#fec82b',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   productHeader: {
-    marginBottom: 12,
-  },
-  productTitleContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
-    flexWrap: 'wrap',
+    marginBottom: 8,
   },
   productName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#0e0b05',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
     flex: 1,
-    marginLeft: 8,
   },
-  stockBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 8,
-  },
-  stockBadgeText: {
-    fontSize: 10,
-    marginLeft: 4,
+  stockStatus: {
+    fontSize: 12,
     fontWeight: '600',
   },
   productSku: {
-    fontSize: 11,
-    color: '#75482f',
-    marginTop: 2,
-    marginLeft: 26,
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 12,
   },
   productDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f1f3f4',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f4',
-  },
-  priceSection: {
-    flex: 1,
   },
   priceLabel: {
-    fontSize: 10,
-    color: '#75482f',
-    marginBottom: 4,
+    fontSize: 12,
+    color: '#999',
   },
   productPrice: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fec82b',
   },
-  buyPriceLabel: {
-    fontSize: 10,
-    color: '#75482f',
-    marginTop: 3,
-  },
-  profitSection: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  profitLabel: {
-    fontSize: 10,
-    color: '#75482f',
-    marginBottom: 4,
-  },
-  productProfit: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4caf50',
-  },
-  marginLabel: {
-    fontSize: 10,
-    color: '#75482f',
-    marginTop: 3,
-  },
-  stockSection: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  stockLabel: {
-    fontSize: 10,
-    color: '#75482f',
-    marginBottom: 4,
-  },
-  productStock: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fec82b',
-  },
-  categoryBadge: {
-    backgroundColor: '#fec82b20',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+  costText: {
+    fontSize: 12,
+    color: '#666',
     marginTop: 4,
   },
-  categoryText: {
-    fontSize: 9,
-    color: '#fec82b',
-    fontWeight: '500',
+  rightDetails: {
+    alignItems: 'flex-end',
+  },
+  quantityLabel: {
+    fontSize: 12,
+    color: '#999',
+  },
+  productQuantity: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  profitText: {
+    fontSize: 12,
+    color: '#4caf50',
+    marginTop: 4,
   },
   productActions: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
+    justifyContent: 'space-between',
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
+    padding: 10,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    borderRadius: 10,
     marginHorizontal: 4,
   },
   editButton: {
     backgroundColor: '#fec82b',
   },
-  editButtonText: {
-    color: '#0e0b05',
-    fontSize: 13,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
   deleteButton: {
-    backgroundColor: '#d32f2f',
+    backgroundColor: '#ff4444',
   },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 13,
+  buttonText: {
+    color: '#0e0b05',
     fontWeight: '600',
-    marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
@@ -1029,20 +906,19 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   label: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: 6,
-    marginTop: 10,
-    color: '#0e0b05',
+    marginBottom: 8,
+    marginTop: 12,
+    color: '#333',
   },
   input: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 10,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
     padding: 12,
-    fontSize: 14,
+    fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e8ecef',
-    color: '#0e0b05',
+    borderColor: '#ddd',
   },
   row: {
     flexDirection: 'row',
@@ -1060,7 +936,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 18,
-    backgroundColor: '#f1f3f4',
+    backgroundColor: '#f0f0f0',
     marginRight: 8,
     marginBottom: 8,
   },
@@ -1068,7 +944,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fec82b',
   },
   categoryButtonText: {
-    color: '#75482f',
+    color: '#666',
     fontSize: 12,
   },
   categoryButtonTextActive: {
@@ -1099,71 +975,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fec82b20',
+    backgroundColor: '#f0f0f0',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     marginBottom: 10,
   },
   customCategoryBadgeText: {
-    color: '#fec82b',
+    color: '#666',
     fontWeight: '500',
     fontSize: 12,
   },
   statsBox: {
-    backgroundColor: '#fec82b10',
+    backgroundColor: '#e8f4f8',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 8,
     marginVertical: 8,
   },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 3,
-  },
-  statsLabel: {
-    fontSize: 12,
-    color: '#75482f',
-    marginLeft: 6,
-    flex: 1,
-  },
-  statsValue: {
-    fontSize: 12,
+  statsText: {
+    fontSize: 14,
+    color: '#007AFF',
     fontWeight: '600',
-  },
-  profitText: {
-    color: '#fec82b',
+    marginVertical: 2,
   },
   saveButton: {
     backgroundColor: '#fec82b',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
     marginBottom: 40,
   },
   saveButtonText: {
     color: '#0e0b05',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 80,
+    paddingTop: 100,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#75482f',
-    marginTop: 16,
+    color: '#999',
   },
   emptySubtext: {
-    fontSize: 13,
-    color: '#bdc1c6',
+    fontSize: 14,
+    color: '#ccc',
     marginTop: 8,
-    textAlign: 'center',
   },
 });
 
