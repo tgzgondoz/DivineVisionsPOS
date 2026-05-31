@@ -6,8 +6,11 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Alert
+  Alert,
+  ScrollView,
+  StatusBar
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import ProductService from '../services/ProductService';
 
 const InventoryScreen = ({ navigation }) => {
@@ -68,10 +71,10 @@ const InventoryScreen = ({ navigation }) => {
   };
 
   const getStockStatus = (quantity) => {
-    if (quantity <= 0) return { label: 'Out of Stock', color: '#ff4444' };
-    if (quantity < 10) return { label: 'Critical', color: '#ff8800' };
-    if (quantity < 50) return { label: 'Normal', color: '#fec82b' };
-    return { label: 'Good', color: '#4caf50' };
+    if (quantity <= 0) return { label: 'Out of Stock', color: '#ff4444', icon: 'close-circle', bgColor: '#ff444420' };
+    if (quantity < 10) return { label: 'Critical', color: '#ff8800', icon: 'alert-circle', bgColor: '#ff880020' };
+    if (quantity < 50) return { label: 'Normal', color: '#fec82b', icon: 'checkmark-circle', bgColor: '#fec82b20' };
+    return { label: 'Good', color: '#4caf50', icon: 'checkmark-done-circle', bgColor: '#4caf5020' };
   };
 
   const formatCurrency = (amount) => {
@@ -85,9 +88,10 @@ const InventoryScreen = ({ navigation }) => {
     const totalValue = (item.quantity || 0) * costPrice;
     const totalProfit = (item.quantity || 0) * profitPerUnit;
     const status = getStockStatus(item.quantity);
+    const margin = costPrice > 0 ? ((profitPerUnit / costPrice) * 100).toFixed(1) : 0;
     
     Alert.alert(
-      `📦 ${item.name}`,
+      `${item.name}`,
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📋 PRODUCT INFORMATION\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -100,7 +104,7 @@ const InventoryScreen = ({ navigation }) => {
       `💵 Cost Price: ${formatCurrency(costPrice)}\n` +
       `💲 Selling Price: ${formatCurrency(sellPrice)}\n` +
       `📈 Profit/Unit: ${formatCurrency(profitPerUnit)}\n` +
-      `📊 Margin: ${costPrice > 0 ? ((profitPerUnit / costPrice) * 100).toFixed(1) : 0}%\n\n` +
+      `📊 Margin: ${margin}%\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📦 INVENTORY\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -112,8 +116,7 @@ const InventoryScreen = ({ navigation }) => {
       `📅 Created: ${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}\n` +
       `🔄 Updated: ${item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'N/A'}`,
       [
-        { text: 'Close', style: 'cancel' },
-        { text: 'OK', onPress: () => console.log('Product viewed:', item.name) }
+        { text: 'Close', style: 'cancel' }
       ],
       { cancelable: true }
     );
@@ -132,27 +135,53 @@ const InventoryScreen = ({ navigation }) => {
         onPress={() => showProductDetails(item)}
         activeOpacity={0.7}
       >
-        <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemSku}>SKU: {item.sku || 'N/A'}</Text>
-          <Text style={styles.itemCategory}>{item.category || 'Uncategorized'}</Text>
-          <Text style={styles.itemPriceInfo}>
-            Cost: {formatCurrency(costPrice)} | Sell: {formatCurrency(sellPrice)}
-          </Text>
+        <View style={styles.itemLeftSection}>
+          <View style={[styles.statusIndicator, { backgroundColor: status.bgColor }]}>
+            <Icon name={status.icon} size={16} color={status.color} />
+          </View>
+          <View style={styles.itemInfo}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.itemMetaRow}>
+              <Icon name="pricetag-outline" size={10} color="#999" />
+              <Text style={styles.itemSku}>SKU: {item.sku || 'N/A'}</Text>
+            </View>
+            <View style={styles.itemMetaRow}>
+              <Icon name="folder-outline" size={10} color="#999" />
+              <Text style={styles.itemCategory}>{item.category || 'Uncategorized'}</Text>
+            </View>
+            <View style={styles.itemPriceRow}>
+              <Icon name="cart-outline" size={10} color="#75482f" />
+              <Text style={styles.itemPriceInfo}>
+                Cost: {formatCurrency(costPrice)} | Sell: {formatCurrency(sellPrice)}
+              </Text>
+            </View>
+          </View>
         </View>
         <View style={styles.itemStatus}>
-          <Text style={[styles.itemQuantity, { color: status.color }]}>
-            {item.quantity || 0} units
-          </Text>
-          <Text style={[styles.itemStatusText, { color: status.color }]}>
-            {status.label}
-          </Text>
-          <Text style={styles.itemValue}>
-            Value: {formatCurrency(itemValue)}
-          </Text>
-          <Text style={styles.itemProfit}>
-            Profit: {formatCurrency(itemProfit)}
-          </Text>
+          <View style={styles.quantityContainer}>
+            <Icon name="cube-outline" size={12} color={status.color} />
+            <Text style={[styles.itemQuantity, { color: status.color }]}>
+              {item.quantity || 0} units
+            </Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
+            <Icon name={status.icon} size={10} color={status.color} />
+            <Text style={[styles.itemStatusText, { color: status.color }]}>
+              {status.label}
+            </Text>
+          </View>
+          <View style={styles.valueContainer}>
+            <Icon name="cash-outline" size={10} color="#666" />
+            <Text style={styles.itemValue}>
+              Value: {formatCurrency(itemValue)}
+            </Text>
+          </View>
+          <View style={styles.profitContainer}>
+            <Icon name="trending-up" size={10} color="#4caf50" />
+            <Text style={styles.itemProfit}>
+              Profit: {formatCurrency(itemProfit)}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -161,43 +190,56 @@ const InventoryScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
         <ActivityIndicator size="large" color="#fec82b" />
+        <Text style={styles.loadingText}>Loading inventory...</Text>
       </View>
     );
   }
 
+  const needsAttention = products.filter(p => p.quantity < 20).length;
+
   return (
     <View style={styles.container}>
-      <View style={styles.statsContainer}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
         <View style={styles.statCard}>
+          <Icon name="cube-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{stats.totalProducts}</Text>
           <Text style={styles.statLabel}>Total Products</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="cash-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{formatCurrency(stats.totalValue)}</Text>
           <Text style={styles.statLabel}>Inventory Value</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="card-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{formatCurrency(stats.totalRetailValue)}</Text>
           <Text style={styles.statLabel}>Retail Value</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="trending-up" size={20} color="#4caf50" />
           <Text style={[styles.statValue, styles.success]}>{formatCurrency(stats.totalProfit)}</Text>
           <Text style={styles.statLabel}>Potential Profit</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="alert-circle-outline" size={20} color="#ff8800" />
           <Text style={[styles.statValue, styles.warning]}>{stats.lowStockItems}</Text>
           <Text style={styles.statLabel}>Low Stock</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="close-circle-outline" size={20} color="#ff4444" />
           <Text style={[styles.statValue, styles.danger]}>{stats.outOfStock}</Text>
           <Text style={styles.statLabel}>Out of Stock</Text>
         </View>
         <View style={styles.statCard}>
+          <Icon name="checkmark-done-circle-outline" size={20} color="#4caf50" />
           <Text style={[styles.statValue, styles.success]}>{stats.highStockItems}</Text>
           <Text style={styles.statLabel}>Well Stocked</Text>
         </View>
-      </View>
+      </ScrollView>
 
       <FlatList
         data={products.sort((a, b) => (a.quantity || 0) - (b.quantity || 0))}
@@ -205,18 +247,28 @@ const InventoryScreen = ({ navigation }) => {
         renderItem={renderInventoryItem}
         ListHeaderComponent={
           <View style={styles.listHeader}>
-            <Text style={styles.listHeaderTitle}>Inventory List</Text>
-            <Text style={styles.listHeaderSubtitle}>
-              {products.filter(p => p.quantity < 20).length} items need attention
-            </Text>
+            <View style={styles.listHeaderLeft}>
+              <Icon name="list-outline" size={20} color="#fec82b" />
+              <View>
+                <Text style={styles.listHeaderTitle}>Inventory List</Text>
+                <Text style={styles.listHeaderSubtitle}>
+                  {needsAttention} items need attention
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.refreshButton} onPress={loadProducts}>
+              <Icon name="refresh-outline" size={18} color="#75482f" />
+            </TouchableOpacity>
           </View>
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
+            <Icon name="cube-outline" size={64} color="#ccc" />
             <Text style={styles.emptyText}>No products in inventory</Text>
             <Text style={styles.emptySubtext}>Add products to see them here</Text>
           </View>
         }
+        contentContainerStyle={styles.listContainer}
       />
     </View>
   );
@@ -231,33 +283,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
-  statsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 16,
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#75482f',
+  },
+  statsScroll: {
     backgroundColor: '#fff',
-    marginBottom: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
   statCard: {
-    width: '33.33%',
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginHorizontal: 4,
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#fec82b',
-    marginBottom: 4,
+    color: '#0e0b05',
+    marginTop: 6,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
+    fontSize: 10,
+    color: '#75482f',
+    fontWeight: '500',
   },
   warning: {
     color: '#ff8800',
@@ -268,22 +323,41 @@ const styles = StyleSheet.create({
   success: {
     color: '#4caf50',
   },
+  listContainer: {
+    paddingBottom: 20,
+  },
   listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
     marginTop: 8,
+    marginHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  listHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   listHeaderTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#0e0b05',
   },
   listHeaderSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    fontSize: 11,
+    color: '#75482f',
+    marginTop: 2,
+  },
+  refreshButton: {
+    padding: 8,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 20,
   },
   inventoryItem: {
     backgroundColor: '#fff',
@@ -295,55 +369,99 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
+  },
+  itemLeftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  statusIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
     marginBottom: 4,
   },
-  itemSku: {
-    fontSize: 12,
-    color: '#999',
+  itemMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     marginBottom: 2,
+  },
+  itemSku: {
+    fontSize: 11,
+    color: '#999',
   },
   itemCategory: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#fec82b',
-    marginBottom: 2,
     fontWeight: '500',
   },
+  itemPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
   itemPriceInfo: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: 10,
+    color: '#75482f',
   },
   itemStatus: {
     alignItems: 'flex-end',
+    gap: 4,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   itemQuantity: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
-    marginBottom: 4,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
   },
   itemStatusText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
-    marginBottom: 4,
+  },
+  valueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   itemValue: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#666',
-    marginBottom: 2,
+  },
+  profitContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   itemProfit: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#4caf50',
   },
   emptyContainer: {
@@ -354,11 +472,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    fontWeight: '600',
+    color: '#75482f',
+    marginTop: 16,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#ccc',
+    fontSize: 13,
+    color: '#999',
     marginTop: 8,
   },
 });

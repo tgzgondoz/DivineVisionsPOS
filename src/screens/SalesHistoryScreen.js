@@ -119,22 +119,44 @@ const SalesHistoryScreen = () => {
         activeOpacity={0.7}
       >
         <View style={styles.saleHeader}>
-          <Text style={styles.saleId}>#{item.id?.slice(-8)}</Text>
-          <Text style={styles.saleDate}>{moment(item.timestamp).format('MM/DD/YY h:mm A')}</Text>
+          <View style={styles.saleIdContainer}>
+            <Icon name="receipt-outline" size={12} color="#75482f" />
+            <Text style={styles.saleId}>#{item.id?.slice(-8)}</Text>
+          </View>
+          <View style={styles.saleDateContainer}>
+            <Icon name="time-outline" size={10} color="#75482f" />
+            <Text style={styles.saleDate}>{moment(item.timestamp).format('MM/DD/YY h:mm A')}</Text>
+          </View>
         </View>
         
-        <Text style={styles.saleCustomer}>{item.customerName || 'Walk-in Customer'}</Text>
+        <View style={styles.customerContainer}>
+          <Icon name="person-outline" size={12} color="#75482f" />
+          <Text style={styles.saleCustomer}>{item.customerName || 'Walk-in Customer'}</Text>
+        </View>
         
         <View style={styles.saleFooter}>
           <View>
             <Text style={styles.saleTotal}>{formatCurrency(item.total)}</Text>
-            <Text style={styles.saleProfit}>Profit: +{formatCurrency(profit)}</Text>
+            <View style={styles.profitContainer}>
+              <Icon name="trending-up" size={10} color="#4caf50" />
+              <Text style={styles.saleProfit}>Profit: +{formatCurrency(profit)}</Text>
+            </View>
           </View>
-          <View style={[styles.paymentBadge, 
+          <View style={[
+            styles.paymentBadge, 
             item.paymentMethod === 'cash' && styles.cashBadge,
             item.paymentMethod === 'card' && styles.cardBadge,
             item.paymentMethod === 'mobile' && styles.mobileBadge
           ]}>
+            <Icon 
+              name={
+                item.paymentMethod === 'cash' ? 'cash-outline' :
+                item.paymentMethod === 'card' ? 'card-outline' :
+                'phone-portrait-outline'
+              } 
+              size={10} 
+              color="#fff" 
+            />
             <Text style={styles.paymentText}>{item.paymentMethod?.toUpperCase()}</Text>
           </View>
         </View>
@@ -152,39 +174,63 @@ const SalesHistoryScreen = () => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Sale Details</Text>
+            <View style={styles.modalHeaderContent}>
+              <Icon name="receipt-outline" size={24} color="#0e0b05" />
+              <Text style={styles.modalTitle}>Sale Details</Text>
+            </View>
             <TouchableOpacity onPress={() => setSelectedSale(null)}>
-              <Icon name="close" size={24} color="#75482f" />
+              <Icon name="close" size={24} color="#0e0b05" />
             </TouchableOpacity>
           </View>
           
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Sale ID</Text>
+              <View style={styles.detailRow}>
+                <Icon name="pricetag-outline" size={14} color="#75482f" />
+                <Text style={styles.detailLabel}>Sale ID</Text>
+              </View>
               <Text style={styles.detailValue}>{selectedSale?.id}</Text>
               
-              <Text style={styles.detailLabel}>Date & Time</Text>
+              <View style={styles.detailRow}>
+                <Icon name="calendar-outline" size={14} color="#75482f" />
+                <Text style={styles.detailLabel}>Date & Time</Text>
+              </View>
               <Text style={styles.detailValue}>{moment(selectedSale?.timestamp).format('MMMM Do YYYY, h:mm:ss a')}</Text>
               
-              <Text style={styles.detailLabel}>Customer</Text>
+              <View style={styles.detailRow}>
+                <Icon name="person-outline" size={14} color="#75482f" />
+                <Text style={styles.detailLabel}>Customer</Text>
+              </View>
               <Text style={styles.detailValue}>{selectedSale?.customerName || 'Walk-in Customer'}</Text>
               
-              <Text style={styles.detailLabel}>Payment Method</Text>
+              <View style={styles.detailRow}>
+                <Icon name="card-outline" size={14} color="#75482f" />
+                <Text style={styles.detailLabel}>Payment Method</Text>
+              </View>
               <Text style={styles.detailValue}>{selectedSale?.paymentMethod?.toUpperCase()}</Text>
             </View>
             
             <View style={styles.detailSection}>
-              <Text style={styles.sectionTitle}>Items</Text>
+              <View style={styles.sectionHeader}>
+                <Icon name="cube-outline" size={16} color="#fec82b" />
+                <Text style={styles.sectionTitle}>Items</Text>
+              </View>
               {selectedSale?.items?.map((item, index) => {
                 const profit = (item.sellPrice - item.buyPrice) * item.quantity;
                 return (
                   <View key={index} style={styles.detailItem}>
                     <View style={styles.itemInfo}>
                       <Text style={styles.itemName}>{item.name}</Text>
-                      <Text style={styles.itemPrice}>
-                        {formatCurrency(item.sellPrice)} × {item.quantity}
-                      </Text>
-                      <Text style={styles.itemProfit}>Profit: +{formatCurrency(profit)}</Text>
+                      <View style={styles.itemPriceContainer}>
+                        <Icon name="cash-outline" size={10} color="#75482f" />
+                        <Text style={styles.itemPrice}>
+                          {formatCurrency(item.sellPrice)} × {item.quantity}
+                        </Text>
+                      </View>
+                      <View style={styles.itemProfitContainer}>
+                        <Icon name="trending-up" size={10} color="#4caf50" />
+                        <Text style={styles.itemProfit}>Profit: +{formatCurrency(profit)}</Text>
+                      </View>
                     </View>
                     <Text style={styles.itemTotal}>{formatCurrency(item.subtotal || item.sellPrice * item.quantity)}</Text>
                   </View>
@@ -214,7 +260,10 @@ const SalesHistoryScreen = () => {
                 </>
               )}
               <View style={styles.totalProfitRow}>
-                <Text style={styles.totalProfitLabel}>Total Profit</Text>
+                <View style={styles.totalProfitLabelContainer}>
+                  <Icon name="trending-up" size={16} color="#4caf50" />
+                  <Text style={styles.totalProfitLabel}>Total Profit</Text>
+                </View>
                 <Text style={styles.totalProfitValue}>
                   +{formatCurrency(selectedSale?.items?.reduce((sum, i) => sum + ((i.sellPrice - i.buyPrice) * i.quantity), 0))}
                 </Text>
@@ -248,27 +297,37 @@ const SalesHistoryScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
       
       <View style={styles.miniHeader}>
-        <Text style={styles.miniHeaderTitle}>Sales</Text>
-        <Text style={styles.miniHeaderDate}>{moment().format('MMM DD, YYYY')}</Text>
+        <View style={styles.miniHeaderTitleContainer}>
+          <Icon name="bar-chart-outline" size={28} color="#0e0b05" />
+          <Text style={styles.miniHeaderTitle}>Sales</Text>
+        </View>
+        <View style={styles.miniHeaderDateContainer}>
+          <Icon name="calendar-outline" size={12} color="#75482f" />
+          <Text style={styles.miniHeaderDate}>{moment().format('MMM DD, YYYY')}</Text>
+        </View>
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
         <View style={styles.statCard}>
+          <Icon name="cash-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{formatCurrency(totalRevenue)}</Text>
           <Text style={styles.statLabel}>Revenue</Text>
         </View>
         
         <View style={styles.statCard}>
+          <Icon name="trending-up" size={20} color="#4caf50" />
           <Text style={[styles.statValue, styles.profitColor]}>{formatCurrency(totalProfit)}</Text>
           <Text style={styles.statLabel}>Profit</Text>
         </View>
         
         <View style={styles.statCard}>
+          <Icon name="cart-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{totalTransactions}</Text>
           <Text style={styles.statLabel}>Sales</Text>
         </View>
         
         <View style={styles.statCard}>
+          <Icon name="stats-chart-outline" size={20} color="#fec82b" />
           <Text style={styles.statValue}>{formatCurrency(averageOrder)}</Text>
           <Text style={styles.statLabel}>Average</Text>
         </View>
@@ -279,31 +338,36 @@ const SalesHistoryScreen = () => {
           style={[styles.filterButton, filter === 'today' && styles.filterButtonActive]}
           onPress={() => setFilter('today')}
         >
+          <Icon name="today-outline" size={12} color={filter === 'today' ? "#0e0b05" : "#75482f"} />
           <Text style={[styles.filterText, filter === 'today' && styles.filterTextActive]}>Today</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, filter === 'week' && styles.filterButtonActive]}
           onPress={() => setFilter('week')}
         >
+          <Icon name="calendar-outline" size={12} color={filter === 'week' ? "#0e0b05" : "#75482f"} />
           <Text style={[styles.filterText, filter === 'week' && styles.filterTextActive]}>Week</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, filter === 'month' && styles.filterButtonActive]}
           onPress={() => setFilter('month')}
         >
+          <Icon name="calendar-number-outline" size={12} color={filter === 'month' ? "#0e0b05" : "#75482f"} />
           <Text style={[styles.filterText, filter === 'month' && styles.filterTextActive]}>Month</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
           onPress={() => setFilter('all')}
         >
+          <Icon name="list-outline" size={12} color={filter === 'all' ? "#0e0b05" : "#75482f"} />
           <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>All</Text>
         </TouchableOpacity>
       </View>
 
       {topProduct && (
         <View style={styles.topProductBanner}>
-          <Text style={styles.topProductText}>🏆 Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
+          <Icon name="trophy-outline" size={14} color="#fec82b" />
+          <Text style={styles.topProductText}>Top: {topProduct.name} ({topProduct.quantity} sold)</Text>
         </View>
       )}
 
@@ -316,7 +380,7 @@ const SalesHistoryScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="receipt-outline" size={64} color="#75482f" />
+            <Icon name="receipt-outline" size={64} color="#ccc" />
             <Text style={styles.emptyText}>No sales found</Text>
             <Text style={styles.emptySubtext}>
               {filter === 'today' ? 'No sales today' : 
@@ -348,7 +412,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 14,
-    color: '#666',
+    color: '#75482f',
   },
   miniHeader: {
     paddingHorizontal: 20,
@@ -356,15 +420,25 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
+    alignItems: 'center',
+  },
+  miniHeaderTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   miniHeaderTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#0e0b05',
   },
+  miniHeaderDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   miniHeaderDate: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#75482f',
   },
   statsScroll: {
@@ -372,50 +446,47 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statCard: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    marginHorizontal: 6,
-    minWidth: 110,
+    marginHorizontal: 4,
+    minWidth: 80,
     alignItems: 'center',
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    padding: 8,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#fec82b',
+    color: '#0e0b05',
+    marginTop: 6,
     marginBottom: 2,
   },
   profitColor: {
     color: '#4caf50',
   },
   statLabel: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: 10,
+    color: '#75482f',
+    fontWeight: '500',
   },
   filterContainer: {
     flexDirection: 'row',
     paddingHorizontal: 16,
     marginBottom: 12,
+    gap: 8,
   },
   filterButton: {
     flex: 1,
-    paddingVertical: 7,
+    paddingVertical: 8,
     alignItems: 'center',
     borderRadius: 20,
-    backgroundColor: '#e9ecef',
-    marginHorizontal: 4,
+    backgroundColor: '#f0f0f0',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
   },
   filterButtonActive: {
     backgroundColor: '#fec82b',
   },
   filterText: {
-    color: '#666',
+    color: '#75482f',
     fontSize: 12,
     fontWeight: '500',
   },
@@ -426,14 +497,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fec82b10',
     marginHorizontal: 16,
     marginBottom: 10,
-    padding: 8,
+    padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#fec82b30',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   topProductText: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#fec82b',
     fontWeight: '500',
   },
@@ -447,7 +521,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: '#0e0b05',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -458,19 +532,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  saleIdContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   saleId: {
     fontSize: 11,
-    color: '#999',
+    color: '#75482f',
+  },
+  saleDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   saleDate: {
     fontSize: 10,
     color: '#999',
   },
+  customerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10,
+  },
   saleCustomer: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#333',
-    marginBottom: 10,
+    color: '#0e0b05',
   },
   saleFooter: {
     flexDirection: 'row',
@@ -482,15 +571,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fec82b',
   },
+  profitContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
   saleProfit: {
     fontSize: 10,
     color: '#4caf50',
-    marginTop: 2,
   },
   paymentBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   cashBadge: {
     backgroundColor: '#4caf50',
@@ -523,35 +620,52 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
+    backgroundColor: '#fec82b',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0e0b05',
+  },
+  detailSection: {
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  modalTitle: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  detailSection: {
-    padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  detailLabel: {
-    fontSize: 11,
-    color: '#666',
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     marginBottom: 3,
     marginTop: 6,
   },
+  detailLabel: {
+    fontSize: 11,
+    color: '#75482f',
+  },
   detailValue: {
     fontSize: 13,
-    color: '#333',
+    color: '#0e0b05',
+    marginBottom: 10,
+    marginLeft: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: '#0e0b05',
   },
   detailItem: {
     flexDirection: 'row',
@@ -567,17 +681,27 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
+  },
+  itemPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
   },
   itemPrice: {
     fontSize: 11,
-    color: '#666',
+    color: '#75482f',
+  },
+  itemProfitContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     marginTop: 2,
   },
   itemProfit: {
     fontSize: 10,
     color: '#4caf50',
-    marginTop: 2,
   },
   itemTotal: {
     fontSize: 13,
@@ -591,11 +715,11 @@ const styles = StyleSheet.create({
   },
   totalDetailLabel: {
     fontSize: 13,
-    color: '#666',
+    color: '#75482f',
   },
   totalDetailValue: {
     fontSize: 13,
-    color: '#333',
+    color: '#0e0b05',
   },
   grandTotalDetail: {
     marginTop: 6,
@@ -606,7 +730,7 @@ const styles = StyleSheet.create({
   grandTotalDetailLabel: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0e0b05',
   },
   grandTotalDetailValue: {
     fontSize: 15,
@@ -624,10 +748,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#e8e8e8',
   },
+  totalProfitLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   totalProfitLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: '#0e0b05',
   },
   totalProfitValue: {
     fontSize: 14,
@@ -641,12 +770,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#999',
+    color: '#75482f',
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 12,
-    color: '#bbb',
+    color: '#999',
     marginTop: 8,
     textAlign: 'center',
   },
