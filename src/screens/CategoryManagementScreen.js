@@ -204,9 +204,7 @@ const CategoryManagementScreen = () => {
   const renderCategoryItem = ({ item }) => (
     <View style={styles.categoryCard}>
       <View style={styles.categoryInfo}>
-        <View style={styles.categoryIcon}>
-          <Icon name="folder" size={24} color="#007AFF" />
-        </View>
+       
         <View style={styles.categoryDetails}>
           <Text style={styles.categoryName}>{item.name}</Text>
           {item.description ? (

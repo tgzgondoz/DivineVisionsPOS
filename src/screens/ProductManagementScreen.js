@@ -336,7 +336,7 @@ const ProductManagementScreen = () => {
             style={[styles.actionButton, styles.editButton]}
             onPress={() => handleEdit(item)}
           >
-            <Icon name="create" size={20} color="#fff" />
+            <Icon name="create" size={18} color="#fff" />
             <Text style={styles.actionButtonText}>Edit</Text>
           </TouchableOpacity>
           
@@ -344,7 +344,7 @@ const ProductManagementScreen = () => {
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleDelete(item)}
           >
-            <Icon name="trash-bin" size={20} color="#fff" />
+            <Icon name="trash-bin" size={18} color="#fff" />
             <Text style={styles.actionButtonText}>Delete</Text>
           </TouchableOpacity>
         </View>
@@ -354,6 +354,7 @@ const ProductManagementScreen = () => {
 
   const getTotalStats = () => {
     const totalProducts = products.length;
+    // Fixed inventory value calculation using cost price (buyPrice) * quantity
     const totalInventoryValue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.buyPrice || 0)), 0);
     const totalPotentialRevenue = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.sellPrice || 0)), 0);
     const totalPotentialProfit = totalPotentialRevenue - totalInventoryValue;
@@ -379,7 +380,8 @@ const ProductManagementScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-      
+     
+
       {/* Add Product FAB */}
       <TouchableOpacity
         style={styles.fab}
@@ -388,37 +390,13 @@ const ProductManagementScreen = () => {
           setModalVisible(true);
         }}
       >
-        <Icon name="add" size={30} color="#fff" />
+        <Icon name="add" size={28} color="#fff" />
       </TouchableOpacity>
-
-      {/* Stats Cards */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{stats.totalProducts}</Text>
-          <Text style={styles.statLabel}>Total Products</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatCurrency(stats.totalInventoryValue)}</Text>
-          <Text style={styles.statLabel}>Inventory Value</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.profitStat]}>{formatCurrency(stats.totalPotentialProfit)}</Text>
-          <Text style={styles.statLabel}>Potential Profit</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
-          <Text style={styles.statLabel}>Low Stock</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={[styles.statValue, styles.dangerText]}>{stats.outOfStockCount}</Text>
-          <Text style={styles.statLabel}>Out of Stock</Text>
-        </View>
-      </ScrollView>
 
       {/* Search and Filters */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
+          <Icon name="search" size={18} color="#999" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by name or SKU..."
@@ -428,7 +406,7 @@ const ProductManagementScreen = () => {
           />
           {searchQuery !== '' && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Icon name="close-circle" size={20} color="#999" />
+              <Icon name="close-circle" size={18} color="#999" />
             </TouchableOpacity>
           )}
         </View>
@@ -437,7 +415,7 @@ const ProductManagementScreen = () => {
           style={styles.filterToggle}
           onPress={() => setShowFilters(!showFilters)}
         >
-          <Icon name="options" size={20} color="#007AFF" />
+          <Icon name="options" size={18} color="#007AFF" />
           <Text style={styles.filterToggleText}>Filters & Sort</Text>
         </TouchableOpacity>
       </View>
@@ -478,8 +456,8 @@ const ProductManagementScreen = () => {
                   styles.sortButtonText,
                   selectedSort === sort && styles.sortButtonTextActive
                 ]}>
-                  {sort === 'sellPrice' ? 'Sell Price' : 
-                   sort === 'buyPrice' ? 'Cost Price' :
+                  {sort === 'sellPrice' ? 'Sell' : 
+                   sort === 'buyPrice' ? 'Cost' :
                    sort === 'profit' ? 'Profit' :
                    sort.charAt(0).toUpperCase() + sort.slice(1)}
                 </Text>
@@ -498,7 +476,7 @@ const ProductManagementScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="cube-outline" size={64} color="#ccc" />
+            <Icon name="cube-outline" size={50} color="#ccc" />
             <Text style={styles.emptyText}>No products found</Text>
             <Text style={styles.emptySubtext}>
               {searchQuery ? 'Try a different search term' : 'Tap + to add your first product'}
@@ -571,15 +549,15 @@ const ProductManagementScreen = () => {
             {formData.buyPrice && formData.sellPrice && (
               <View style={styles.statsBox}>
                 <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>💰 Profit per unit:</Text>
+                  <Text style={styles.statsLabel}>Profit per unit:</Text>
                   <Text style={[styles.statsValue, styles.profitText]}>${calculateProfit()}</Text>
                 </View>
                 <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>📊 Profit Margin:</Text>
+                  <Text style={styles.statsLabel}>Profit Margin:</Text>
                   <Text style={[styles.statsValue, styles.profitText]}>{calculateMargin()}</Text>
                 </View>
                 <View style={styles.statsRow}>
-                  <Text style={styles.statsLabel}>📈 ROI:</Text>
+                  <Text style={styles.statsLabel}>ROI:</Text>
                   <Text style={[styles.statsValue, styles.profitText]}>{calculateROI()}</Text>
                 </View>
               </View>
@@ -667,18 +645,70 @@ const ProductManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
+  },
+  statsScroll: {
+    backgroundColor: '#fff',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8ecef',
+  },
+  statsScrollContent: {
+    paddingHorizontal: 12,
+  },
+  statCard: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginHorizontal: 6,
+    minWidth: 110,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  profitCard: {
+    backgroundColor: '#e8f5e9',
+  },
+  warningCard: {
+    backgroundColor: '#fff3e0',
+  },
+  dangerCard: {
+    backgroundColor: '#ffebee',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1a73e8',
+    marginBottom: 4,
+  },
+  profitText: {
+    color: '#2e7d32',
+  },
+  warningText: {
+    color: '#ed6c02',
+  },
+  dangerText: {
+    color: '#d32f2f',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: '#5f6368',
+    fontWeight: '500',
   },
   fab: {
     position: 'absolute',
@@ -687,63 +717,29 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     zIndex: 100,
   },
-  statsScroll: {
-    backgroundColor: '#fff',
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-    marginTop: 8,
-  },
-  statCard: {
-    backgroundColor: '#f8f8f8',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginHorizontal: 8,
-    minWidth: 120,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 4,
-  },
-  profitStat: {
-    color: '#4caf50',
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
-  warningText: {
-    color: '#ff8800',
-  },
-  dangerText: {
-    color: '#ff4444',
-  },
   searchContainer: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#e8ecef',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 12,
+    backgroundColor: '#f1f3f4',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    marginBottom: 10,
   },
   searchIcon: {
     marginRight: 8,
@@ -751,7 +747,8 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 15,
+    color: '#202124',
   },
   filterToggle: {
     flexDirection: 'row',
@@ -761,21 +758,22 @@ const styles = StyleSheet.create({
   },
   filterToggleText: {
     marginLeft: 8,
-    color: '#007AFF',
+    color: '#1a73e8',
     fontSize: 14,
+    fontWeight: '500',
   },
   filtersPanel: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#e8ecef',
   },
   filterTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: '#3c4043',
     marginBottom: 8,
-    marginTop: 8,
+    marginTop: 4,
   },
   categoryScroll: {
     flexDirection: 'row',
@@ -783,16 +781,18 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f1f3f4',
     marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
   },
   categoryChipText: {
-    color: '#666',
+    color: '#5f6368',
+    fontSize: 13,
+    fontWeight: '500',
   },
   categoryChipTextActive: {
     color: '#fff',
@@ -806,15 +806,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f1f3f4',
     marginHorizontal: 4,
   },
   sortButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
   },
   sortButtonText: {
-    color: '#666',
-    fontSize: 11,
+    color: '#5f6368',
+    fontSize: 12,
+    fontWeight: '500',
   },
   sortButtonTextActive: {
     color: '#fff',
@@ -826,12 +827,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     margin: 12,
     padding: 16,
-    borderRadius: 12,
-    elevation: 2,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   productHeader: {
     marginBottom: 12,
@@ -840,12 +841,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   productName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#202124',
     flex: 1,
   },
   stockBadge: {
@@ -859,10 +860,11 @@ const styles = StyleSheet.create({
   stockBadgeText: {
     fontSize: 10,
     marginLeft: 4,
+    fontWeight: '600',
   },
   productSku: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#80868b',
     marginTop: 2,
   },
   productDetails: {
@@ -871,71 +873,71 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: '#f1f3f4',
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#f1f3f4',
   },
   priceSection: {
     flex: 1,
   },
   priceLabel: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: 10,
+    color: '#80868b',
     marginBottom: 4,
   },
   productPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#1a73e8',
   },
   buyPriceLabel: {
     fontSize: 10,
-    color: '#666',
-    marginTop: 2,
+    color: '#80868b',
+    marginTop: 3,
   },
   profitSection: {
     flex: 1,
     alignItems: 'center',
   },
   profitLabel: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: 10,
+    color: '#80868b',
     marginBottom: 4,
   },
   productProfit: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4caf50',
+    color: '#2e7d32',
   },
   marginLabel: {
     fontSize: 10,
-    color: '#666',
-    marginTop: 2,
+    color: '#80868b',
+    marginTop: 3,
   },
   stockSection: {
     flex: 1,
     alignItems: 'flex-end',
   },
   stockLabel: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: 10,
+    color: '#80868b',
     marginBottom: 4,
   },
   productStock: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#202124',
   },
   categoryBadge: {
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#e8f0fe',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 3,
+    borderRadius: 6,
     marginTop: 4,
   },
   categoryText: {
-    fontSize: 10,
-    color: '#007AFF',
+    fontSize: 9,
+    color: '#1a73e8',
     fontWeight: '500',
   },
   productActions: {
@@ -949,18 +951,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     marginHorizontal: 4,
   },
   editButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
   },
   deleteButton: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#d32f2f',
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -973,10 +975,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -984,19 +986,20 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    marginBottom: 8,
-    marginTop: 12,
-    color: '#333',
+    marginBottom: 6,
+    marginTop: 10,
+    color: '#3c4043',
   },
   input: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
     padding: 12,
-    fontSize: 16,
+    fontSize: 14,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#e8ecef',
+    color: '#202124',
   },
   row: {
     flexDirection: 'row',
@@ -1008,21 +1011,22 @@ const styles = StyleSheet.create({
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#e0e0e0',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
+    backgroundColor: '#f1f3f4',
     marginRight: 8,
     marginBottom: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
   },
   categoryButtonText: {
-    color: '#666',
+    color: '#5f6368',
+    fontSize: 12,
   },
   categoryButtonTextActive: {
     color: '#fff',
@@ -1030,86 +1034,88 @@ const styles = StyleSheet.create({
   customCategoryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   customCategoryInput: {
     flex: 1,
     marginRight: 8,
   },
   customCategorySubmit: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 11,
     borderRadius: 8,
   },
   customCategorySubmitText: {
     color: '#fff',
     fontWeight: '600',
+    fontSize: 12,
   },
   customCategoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#e8f0fe',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   customCategoryBadgeText: {
-    color: '#007AFF',
+    color: '#1a73e8',
     fontWeight: '500',
+    fontSize: 12,
   },
   statsBox: {
-    backgroundColor: '#e8f4f8',
+    backgroundColor: '#e8f0fe',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginVertical: 8,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 2,
+    marginVertical: 3,
   },
   statsLabel: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: 12,
+    color: '#5f6368',
   },
   statsValue: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   profitText: {
-    color: '#4caf50',
+    color: '#2e7d32',
   },
   saveButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a73e8',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 20,
     marginBottom: 40,
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
+    paddingTop: 80,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#999',
+    color: '#9aa0a6',
     marginTop: 16,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#ccc',
+    fontSize: 13,
+    color: '#bdc1c6',
     marginTop: 8,
     textAlign: 'center',
   },

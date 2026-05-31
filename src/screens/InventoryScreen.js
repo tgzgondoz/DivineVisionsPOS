@@ -15,6 +15,8 @@ const InventoryScreen = ({ navigation }) => {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalValue: 0,
+    totalRetailValue: 0,
+    totalProfit: 0,
     lowStockItems: 0,
     outOfStock: 0,
     highStockItems: 0
@@ -34,12 +36,37 @@ const InventoryScreen = ({ navigation }) => {
 
   const calculateStats = (productsList) => {
     const totalProducts = productsList.length;
-    const totalValue = productsList.reduce((sum, p) => sum + ((p.quantity || 0) * (p.cost || 0)), 0);
+    
+    // Calculate inventory value based on cost price (buyPrice)
+    const totalValue = productsList.reduce((sum, p) => {
+      const quantity = p.quantity || 0;
+      const cost = p.buyPrice || p.cost || 0;
+      return sum + (quantity * cost);
+    }, 0);
+    
+    // Calculate total retail value based on selling price
+    const totalRetailValue = productsList.reduce((sum, p) => {
+      const quantity = p.quantity || 0;
+      const sellPrice = p.sellPrice || 0;
+      return sum + (quantity * sellPrice);
+    }, 0);
+    
+    // Calculate total potential profit
+    const totalProfit = totalRetailValue - totalValue;
+    
     const lowStockItems = productsList.filter(p => p.quantity < 10 && p.quantity > 0).length;
     const outOfStock = productsList.filter(p => p.quantity === 0).length;
     const highStockItems = productsList.filter(p => p.quantity >= 50).length;
     
-    setStats({ totalProducts, totalValue, lowStockItems, outOfStock, highStockItems });
+    setStats({ 
+      totalProducts, 
+      totalValue, 
+      totalRetailValue, 
+      totalProfit, 
+      lowStockItems, 
+      outOfStock, 
+      highStockItems 
+    });
   };
 
   const getStockStatus = (quantity) => {
@@ -49,8 +76,17 @@ const InventoryScreen = ({ navigation }) => {
     return { label: 'Good', color: '#4caf50' };
   };
 
+  const formatCurrency = (amount) => {
+    return `$${amount?.toFixed(2) || '0.00'}`;
+  };
+
   const renderInventoryItem = ({ item }) => {
     const status = getStockStatus(item.quantity);
+    const costPrice = item.buyPrice || item.cost || 0;
+    const sellPrice = item.sellPrice || 0;
+    const itemValue = (item.quantity || 0) * costPrice;
+    const itemProfit = (item.quantity || 0) * (sellPrice - costPrice);
+    
     return (
       <TouchableOpacity 
         style={styles.inventoryItem}
@@ -59,7 +95,10 @@ const InventoryScreen = ({ navigation }) => {
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{item.name}</Text>
           <Text style={styles.itemSku}>SKU: {item.sku || 'N/A'}</Text>
-          <Text style={styles.itemCategory}>{item.category}</Text>
+          <Text style={styles.itemCategory}>{item.category || 'Uncategorized'}</Text>
+          <Text style={styles.itemPriceInfo}>
+            Cost: {formatCurrency(costPrice)} | Sell: {formatCurrency(sellPrice)}
+          </Text>
         </View>
         <View style={styles.itemStatus}>
           <Text style={[styles.itemQuantity, { color: status.color }]}>
@@ -69,7 +108,10 @@ const InventoryScreen = ({ navigation }) => {
             {status.label}
           </Text>
           <Text style={styles.itemValue}>
-            ${((item.quantity || 0) * (item.cost || 0)).toFixed(2)}
+            Value: {formatCurrency(itemValue)}
+          </Text>
+          <Text style={styles.itemProfit}>
+            Profit: {formatCurrency(itemProfit)}
           </Text>
         </View>
       </TouchableOpacity>
@@ -92,8 +134,16 @@ const InventoryScreen = ({ navigation }) => {
           <Text style={styles.statLabel}>Total Products</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>${stats.totalValue.toFixed(2)}</Text>
+          <Text style={styles.statValue}>{formatCurrency(stats.totalValue)}</Text>
           <Text style={styles.statLabel}>Inventory Value</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{formatCurrency(stats.totalRetailValue)}</Text>
+          <Text style={styles.statLabel}>Retail Value</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={[styles.statValue, styles.success]}>{formatCurrency(stats.totalProfit)}</Text>
+          <Text style={styles.statLabel}>Potential Profit</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={[styles.statValue, styles.warning]}>{stats.lowStockItems}</Text>
@@ -224,6 +274,11 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 12,
     color: '#007AFF',
+    marginBottom: 2,
+  },
+  itemPriceInfo: {
+    fontSize: 11,
+    color: '#666',
   },
   itemStatus: {
     alignItems: 'flex-end',
@@ -241,6 +296,11 @@ const styles = StyleSheet.create({
   itemValue: {
     fontSize: 12,
     color: '#666',
+    marginBottom: 2,
+  },
+  itemProfit: {
+    fontSize: 12,
+    color: '#4caf50',
   },
   emptyContainer: {
     flex: 1,

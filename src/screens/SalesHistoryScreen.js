@@ -284,31 +284,28 @@ const SalesHistoryScreen = () => {
         <Text style={styles.miniHeaderDate}>{moment().format('MMM DD, YYYY')}</Text>
       </View>
 
-      {/* Stats Cards */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatCurrency(totalRevenue)}</Text>
-          <Text style={styles.statLabel}>Revenue</Text>
-        </View>
-        
-        <View style={styles.statCard}>
-        
-          <Text style={[styles.statValue, styles.profitColor]}>{formatCurrency(totalProfit)}</Text>
-          <Text style={styles.statLabel}>Profit</Text>
-        </View>
-        
-        <View style={styles.statCard}>
-          
-          <Text style={styles.statValue}>{totalTransactions}</Text>
-          <Text style={styles.statLabel}>Sales</Text>
-        </View>
-        
-        <View style={styles.statCard}>
-         
-          <Text style={styles.statValue}>{formatCurrency(averageOrder)}</Text>
-          <Text style={styles.statLabel}>Average</Text>
-        </View>
-      </ScrollView>
+     {/* Stats Cards */}
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
+  <View style={styles.statCard}>
+    <Text style={styles.statValue}>{formatCurrency(totalRevenue)}</Text>
+    <Text style={styles.statLabel}>Revenue</Text>
+  </View>
+  
+  <View style={styles.statCard}>
+    <Text style={[styles.statValue, styles.profitColor]}>{formatCurrency(totalProfit)}</Text>
+    <Text style={styles.statLabel}>Profit</Text>
+  </View>
+  
+  <View style={styles.statCard}>
+    <Text style={styles.statValue}>{totalTransactions}</Text>
+    <Text style={styles.statLabel}>Sales</Text>
+  </View>
+  
+  <View style={styles.statCard}>
+    <Text style={styles.statValue}>{formatCurrency(averageOrder)}</Text>
+    <Text style={styles.statLabel}>Average</Text>
+  </View>
+</ScrollView>
 
       {/* Filter Buttons */}
       <View style={styles.filterContainer}>
@@ -338,15 +335,7 @@ const SalesHistoryScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Top Product Banner */}
-      {topProduct && (
-        <View style={styles.topProductBanner}>
-          <Icon name="star" size={14} color="#ffc107" />
-          <Text style={styles.topProductText}>
-            Best seller: {topProduct.name} ({topProduct.quantity} units)
-          </Text>
-        </View>
-      )}
+     
 
       {/* Sales List */}
       <FlatList
@@ -414,18 +403,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statCard: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 14,
-    marginHorizontal: 6,
-    minWidth: 110,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+  paddingHorizontal: 18,
+  paddingVertical: 12,
+  marginHorizontal: 6,
+  minWidth: 110,
+  alignItems: 'center',
   },
   statIcon: {
     width: 32,
