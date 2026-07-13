@@ -209,18 +209,7 @@ const InventoryScreen = ({ navigation }) => {
       <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
       
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>Inventory</Text>
-            <Text style={styles.headerSubtitle}>
-              {stats.totalProducts} products in stock
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.headerAction} onPress={loadProducts}>
-            <Icon name="refresh-outline" size={22} color="#FEC82B" />
-          </TouchableOpacity>
-        </View>
+      
         
         {/* Stats Cards */}
         <ScrollView 
