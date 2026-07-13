@@ -7,7 +7,10 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { getDatabaseInstance, ref, push, set, update } from '../config/firebase';
@@ -111,232 +114,415 @@ const AddEditProductScreen = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.label}>Product Name *</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.name}
-          onChangeText={(text) => handleInputChange('name', text)}
-          placeholder="Enter product name"
-          placeholderTextColor="#75482f"
-        />
-
-        <Text style={styles.label}>SKU</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.sku}
-          onChangeText={(text) => handleInputChange('sku', text)}
-          placeholder="Enter SKU"
-          placeholderTextColor="#75482f"
-        />
-
-        <View style={styles.row}>
-          <View style={styles.halfWidth}>
-            <Text style={styles.label}>Selling Price *</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.sellPrice}
-              onChangeText={(text) => handleInputChange('sellPrice', text)}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor="#75482f"
-            />
-          </View>
-          <View style={styles.halfWidth}>
-            <Text style={styles.label}>Cost Price *</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.buyPrice}
-              onChangeText={(text) => handleInputChange('buyPrice', text)}
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              placeholderTextColor="#75482f"
-            />
-          </View>
-        </View>
-
-        {formData.sellPrice && formData.buyPrice && (
-          <View style={styles.statsBox}>
-            <View style={styles.statsRow}>
-              <Icon name="trending-up" size={16} color="#fec82b" />
-              <Text style={styles.statsText}> Profit: ${calculateProfit()}</Text>
-            </View>
-            <View style={styles.statsDivider} />
-            <View style={styles.statsRow}>
-              <Icon name="pie-chart" size={16} color="#fec82b" />
-              <Text style={styles.statsText}> Margin: {calculateMargin()}</Text>
-            </View>
-          </View>
-        )}
-
-        <Text style={styles.label}>Category *</Text>
-        <View style={styles.categoryContainer}>
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[
-                styles.categoryButton,
-                formData.category === cat && styles.categoryButtonActive
-              ]}
-              onPress={() => handleInputChange('category', cat)}
-            >
-              <Text style={[
-                styles.categoryButtonText,
-                formData.category === cat && styles.categoryButtonTextActive
-              ]}>{cat}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.label}>Initial Quantity</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.quantity}
-          onChangeText={(text) => handleInputChange('quantity', text)}
-          placeholder="0"
-          keyboardType="numeric"
-          placeholderTextColor="#75482f"
-        />
-
-        <Text style={styles.label}>Supplier</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.supplier}
-          onChangeText={(text) => handleInputChange('supplier', text)}
-          placeholder="Enter supplier name"
-          placeholderTextColor="#75482f"
-        />
-
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          value={formData.description}
-          onChangeText={(text) => handleInputChange('description', text)}
-          placeholder="Enter product description"
-          placeholderTextColor="#75482f"
-          multiline
-          numberOfLines={4}
-        />
-
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSave}
-          disabled={loading}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView 
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      >
+        <ScrollView 
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          {loading ? (
-            <ActivityIndicator color="#0e0b05" />
-          ) : (
-            <>
-              <Icon name={isEditing ? "create" : "add-circle"} size={20} color="#0e0b05" />
-              <Text style={styles.saveButtonText}>
-                {isEditing ? 'Update Product' : 'Add Product'}
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerLeft}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-back" size={24} color="#111827" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>
+                {isEditing ? 'Edit Product' : 'New Product'}
               </Text>
-            </>
-          )}
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+            </View>
+            <View style={styles.headerBadge}>
+              <Icon name={isEditing ? "create-outline" : "add-circle-outline"} size={24} color="#FEC82B" />
+            </View>
+          </View>
+
+          <View style={styles.form}>
+            {/* Product Name */}
+            <View style={styles.inputGroup}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Product Name</Text>
+                <Text style={styles.required}>*</Text>
+              </View>
+              <View style={styles.inputWrapper}>
+                <Icon name="cube-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  value={formData.name}
+                  onChangeText={(text) => handleInputChange('name', text)}
+                  placeholder="Enter product name"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            {/* Product Description (formerly SKU) */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Product Description</Text>
+              <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={formData.sku}
+                  onChangeText={(text) => handleInputChange('sku', text)}
+                  placeholder="Enter product description"
+                  placeholderTextColor="#9CA3AF"
+                  multiline
+                  numberOfLines={3}
+                />
+              </View>
+            </View>
+
+            {/* Price Row */}
+            <View style={styles.row}>
+              <View style={[styles.halfWidth, styles.inputGroup]}>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Selling Price</Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.currencySymbol}>$</Text>
+                  <TextInput
+                    style={[styles.input, styles.priceInput]}
+                    value={formData.sellPrice}
+                    onChangeText={(text) => handleInputChange('sellPrice', text)}
+                    placeholder="0.00"
+                    keyboardType="decimal-pad"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+              </View>
+              
+              <View style={[styles.halfWidth, styles.inputGroup]}>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Cost Price</Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.currencySymbol}>$</Text>
+                  <TextInput
+                    style={[styles.input, styles.priceInput]}
+                    value={formData.buyPrice}
+                    onChangeText={(text) => handleInputChange('buyPrice', text)}
+                    placeholder="0.00"
+                    keyboardType="decimal-pad"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* Profit Stats */}
+            {formData.sellPrice && formData.buyPrice && (
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Icon name="trending-up" size={18} color="#10B981" />
+                  <Text style={styles.statLabel}>Profit</Text>
+                  <Text style={styles.statValue}>${calculateProfit()}</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Icon name="pie-chart" size={18} color="#10B981" />
+                  <Text style={styles.statLabel}>Margin</Text>
+                  <Text style={styles.statValue}>{calculateMargin()}</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Category */}
+            <View style={styles.inputGroup}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Category</Text>
+                <Text style={styles.required}>*</Text>
+              </View>
+              <View style={styles.categoryContainer}>
+                {categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[
+                      styles.categoryButton,
+                      formData.category === cat && styles.categoryButtonActive
+                    ]}
+                    onPress={() => handleInputChange('category', cat)}
+                  >
+                    <Text style={[
+                      styles.categoryButtonText,
+                      formData.category === cat && styles.categoryButtonTextActive
+                    ]}>{cat}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Quantity */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Initial Quantity</Text>
+              <View style={styles.inputWrapper}>
+                <Icon name="layers-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  value={formData.quantity}
+                  onChangeText={(text) => handleInputChange('quantity', text)}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            {/* Supplier */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Supplier</Text>
+              <View style={styles.inputWrapper}>
+                <Icon name="business-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  value={formData.supplier}
+                  onChangeText={(text) => handleInputChange('supplier', text)}
+                  placeholder="Enter supplier name"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            {/* Additional Notes */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Additional Notes</Text>
+              <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={formData.description}
+                  onChangeText={(text) => handleInputChange('description', text)}
+                  placeholder="Add any additional notes about this product"
+                  placeholderTextColor="#9CA3AF"
+                  multiline
+                  numberOfLines={4}
+                />
+              </View>
+            </View>
+
+            {/* Save Button */}
+            <TouchableOpacity
+              style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+              onPress={handleSave}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color="#111827" size="small" />
+              ) : (
+                <>
+                  <Icon name={isEditing ? "checkmark-circle" : "add-circle"} size={22} color="#111827" />
+                  <Text style={styles.saveButtonText}>
+                    {isEditing ? 'Update Product' : 'Add Product'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F3F4F6',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 4,
+    marginRight: 12,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  headerBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FEC82B20',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   form: {
     padding: 20,
   },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: 8,
-    marginTop: 12,
-    color: '#0e0b05',
+    color: '#374151',
+  },
+  required: {
+    color: '#EF4444',
+    fontSize: 16,
+    marginLeft: 4,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    overflow: 'hidden',
+  },
+  inputIcon: {
+    paddingLeft: 12,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    color: '#0e0b05',
+    color: '#111827',
+  },
+  currencySymbol: {
+    paddingLeft: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  priceInput: {
+    paddingLeft: 4,
+  },
+  textAreaWrapper: {
+    alignItems: 'flex-start',
+    height: 100,
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
+    paddingTop: 12,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
   },
   halfWidth: {
-    width: '48%',
+    flex: 1,
   },
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 12,
+    marginTop: 4,
   },
   categoryButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F3F4F6',
     marginRight: 8,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   categoryButtonActive: {
-    backgroundColor: '#fec82b',
+    backgroundColor: '#FEC82B',
+    borderColor: '#FEC82B',
   },
   categoryButtonText: {
-    color: '#75482f',
+    fontSize: 13,
+    color: '#374151',
+    fontWeight: '500',
   },
   categoryButtonTextActive: {
-    color: '#0e0b05',
+    color: '#111827',
     fontWeight: '600',
   },
-  statsBox: {
-    backgroundColor: '#fec82b10',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
+  statsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 14,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
     justifyContent: 'space-around',
   },
-  statsRow: {
+  statItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
-  statsDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#fec82b30',
+  statLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
   },
-  statsText: {
+  statValue: {
     fontSize: 14,
-    color: '#fec82b',
-    fontWeight: '600',
-    marginLeft: 4,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#D1D5DB',
   },
   saveButton: {
-    backgroundColor: '#fec82b',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 40,
+    backgroundColor: '#FEC82B',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginTop: 24,
+    marginBottom: 20,
+    gap: 8,
+    shadowColor: '#FEC82B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  saveButtonDisabled: {
+    opacity: 0.7,
   },
   saveButtonText: {
-    color: '#0e0b05',
+    color: '#111827',
     fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 8,
+    fontWeight: '700',
   },
 });
 

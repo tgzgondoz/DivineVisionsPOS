@@ -71,18 +71,23 @@ const LoginScreen = ({ onLogin }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
-          {!imageError ? (
-            <Image 
-              source={require('../../assets/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <View style={[styles.logo, styles.fallbackLogo]}>
-              <Icon name="storefront" size={60} color="#fec82b" />
+          {/* Circular border wrapper */}
+          <View style={styles.logoCircleWrapper}>
+            <View style={styles.logoCircle}>
+              {!imageError ? (
+                <Image 
+                  source={require('../../assets/logo.png')} 
+                  style={styles.logo}
+                  resizeMode="contain"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <View style={[styles.logo, styles.fallbackLogo]}>
+                  <Icon name="storefront" size={60} color="#fec82b" />
+                </View>
+              )}
             </View>
-          )}
+          </View>
           <Text style={styles.title}>TuckShop</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
@@ -127,6 +132,27 @@ const LoginScreen = ({ onLogin }) => {
               <Text style={styles.loginButtonText}>Login</Text>
             )}
           </TouchableOpacity>
+
+          {/* Demo Accounts Section - Uncommented */}
+          <View style={styles.demoContainer}>
+            <Text style={styles.demoTitle}>Demo Accounts</Text>
+            
+            <TouchableOpacity style={styles.demoButton} onPress={demoAdmin}>
+              <View style={styles.demoRow}>
+                <Icon name="person" size={16} color="#75482f" />
+                <Text style={styles.demoText}>Admin: admin@devinepos.com</Text>
+              </View>
+              <Text style={styles.demoPassword}>Password: Devine@Admin2026#Secure</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.demoButton} onPress={demoCashier}>
+              <View style={styles.demoRow}>
+                <Icon name="person-outline" size={16} color="#75482f" />
+                <Text style={styles.demoText}>Cashier: cashier@devinepos.com</Text>
+              </View>
+              <Text style={styles.demoPassword}>Password: Devine@Cashier2026#Strong</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -147,16 +173,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  logo: {
-    width: 120,
-    height: 120,
+  // New wrapper for the circle with shadow
+  logoCircleWrapper: {
     marginBottom: 16,
+    shadowColor: '#75482f',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  // The circular container with border
+  logoCircle: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 4,
+    borderColor: '#fec82b', // Gold/yellow border matching your brand
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    // Optional: Add inner glow effect
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   fallbackLogo: {
     backgroundColor: '#f0f0f0',
-    borderRadius: 60,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 28,
@@ -226,8 +275,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   demoButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
+    paddingVertical: 10,
+    marginBottom: 10,
     backgroundColor: '#f8f8f8',
     borderRadius: 8,
     paddingHorizontal: 12,
@@ -239,14 +288,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   demoText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#0e0b05',
     fontWeight: '500',
   },
   demoPassword: {
     fontSize: 11,
     color: '#75482f',
-    marginLeft: 20,
+    marginLeft: 22,
   },
 });
 
