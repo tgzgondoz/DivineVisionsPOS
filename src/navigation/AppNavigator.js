@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,47 +42,61 @@ const AppNavigator = ({ onLogout }) => {
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#fec82b',
-        tabBarInactiveTintColor: '#75482f',
+        tabBarActiveTintColor: '#FEC82B',
+        tabBarInactiveTintColor: '#6B7280',
         tabBarStyle: {
-          height: 60,
+          height: 65,
           paddingBottom: 8,
           paddingTop: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E5E7EB',
+          elevation: 8,
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '500',
+          marginTop: 2,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 4,
         },
         headerStyle: {
-          
+          backgroundColor: '#FFFFFF',
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
+          borderBottomColor: '#E5E7EB',
         },
-        headerTintColor: '#0e0b05',
+        headerTintColor: '#111827',
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '700',
           fontSize: 18,
         },
         headerTitleAlign: 'center',
         headerLeft: () => (
-          <View style={{ marginLeft: 16, flexDirection: 'row', alignItems: 'center' }}>
-            <Image 
-              source={require('../../assets/logo.png')} 
-              style={{ width: 32, height: 32, borderRadius: 16 }}
-              resizeMode="contain"
-            />
-            <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#75482f' }}>
-              POS
-            </Text>
+          <View style={styles.headerLeft}>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('../../assets/logo.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.logoText}>POS</Text>
           </View>
         ),
         headerRight: () => (
           <TouchableOpacity 
             onPress={onLogout} 
-            style={{ marginRight: 16 }}
+            style={styles.logoutButton}
+            activeOpacity={0.7}
           >
-            <Icon name="log-out" size={22} color="#0e0b05" />
+            <Icon name="log-out-outline" size={22} color="#6B7280" />
           </TouchableOpacity>
         ),
       })}
@@ -145,8 +159,48 @@ const AppNavigator = ({ onLogout }) => {
         initialParams={{ screenName: 'Inventory Dashboard' }}
       />
       
+      {/* Admin Dashboard - Only Admin */}
+    
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
+  },
+  logoContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEC82B15',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+  },
+  logoText: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FEC82B',
+  },
+  logoutButton: {
+    marginRight: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+});
 
 export default AppNavigator;

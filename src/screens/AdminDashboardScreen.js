@@ -10,7 +10,8 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  SafeAreaView
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthService from '../services/AuthService';
@@ -148,22 +149,37 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
     );
   };
 
+  const getInitials = (name) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const renderUserItem = ({ item }) => (
     <View style={styles.userCard}>
       <View style={styles.userInfo}>
-        <View style={styles.userAvatar}>
-          <Icon name="person" size={24} color="#fff" />
+        <View style={[styles.userAvatar, item.role === 'admin' ? styles.adminAvatar : styles.cashierAvatar]}>
+          <Text style={styles.avatarText}>{getInitials(item.fullName)}</Text>
         </View>
         <View style={styles.userDetails}>
           <Text style={styles.userName}>{item.fullName}</Text>
           <Text style={styles.userEmail}>{item.email}</Text>
           <View style={styles.userMeta}>
             <View style={[styles.roleBadge, item.role === 'admin' ? styles.adminBadge : styles.cashierBadge]}>
+              <Icon 
+                name={item.role === 'admin' ? 'shield-checkmark' : 'person'} 
+                size={10} 
+                color={item.role === 'admin' ? '#EF4444' : '#10B981'} 
+              />
               <Text style={[styles.roleText, item.role === 'admin' ? styles.adminRoleText : styles.cashierRoleText]}>
                 {item.role?.toUpperCase()}
               </Text>
             </View>
             <View style={[styles.statusBadge, item.isActive ? styles.activeBadge : styles.inactiveBadge]}>
+              <View style={[styles.statusDot, item.isActive ? styles.activeDot : styles.inactiveDot]} />
               <Text style={[styles.statusText, item.isActive ? styles.activeStatusText : styles.inactiveStatusText]}>
                 {item.isActive ? 'Active' : 'Inactive'}
               </Text>
@@ -177,8 +193,9 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
           <TouchableOpacity
             style={[styles.actionBtn, styles.promoteBtn]}
             onPress={() => handleChangeRole(item.id, 'admin')}
+            activeOpacity={0.7}
           >
-            <Icon name="arrow-up" size={16} color="#0e0b05" />
+            <Icon name="arrow-up" size={14} color="#111827" />
             <Text style={styles.actionBtnText}>Promote</Text>
           </TouchableOpacity>
         )}
@@ -186,24 +203,27 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
           <TouchableOpacity
             style={[styles.actionBtn, styles.demoteBtn]}
             onPress={() => handleChangeRole(item.id, 'cashier')}
+            activeOpacity={0.7}
           >
-            <Icon name="arrow-down" size={16} color="#fff" />
+            <Icon name="arrow-down" size={14} color="#FFFFFF" />
             <Text style={styles.actionBtnText}>Demote</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
           style={[styles.actionBtn, item.isActive ? styles.deactivateBtn : styles.activateBtn]}
           onPress={() => handleToggleStatus(item.id, item.isActive)}
+          activeOpacity={0.7}
         >
-          <Icon name={item.isActive ? "close" : "checkmark"} size={16} color="#fff" />
+          <Icon name={item.isActive ? "close" : "checkmark"} size={14} color="#FFFFFF" />
           <Text style={styles.actionBtnText}>{item.isActive ? 'Deactivate' : 'Activate'}</Text>
         </TouchableOpacity>
         {item.id !== user.id && (
           <TouchableOpacity
             style={[styles.actionBtn, styles.deleteBtn]}
             onPress={() => handleDeleteUser(item.id, item.fullName)}
+            activeOpacity={0.7}
           >
-            <Icon name="trash-bin" size={16} color="#fff" />
+            <Icon name="trash" size={14} color="#FFFFFF" />
             <Text style={styles.actionBtnText}>Delete</Text>
           </TouchableOpacity>
         )}
@@ -214,41 +234,79 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#fec82b" />
+        <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
+        <ActivityIndicator size="large" color="#FEC82B" />
+        <Text style={styles.loadingText}>Loading users...</Text>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
+      
       <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>Admin Dashboard</Text>
+            <Text style={styles.headerSubtitle}>
+              {stats.totalUsers} users • {stats.activeUsers} active
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.headerAction} onPress={loadUsers}>
+            <Icon name="refresh-outline" size={22} color="#FEC82B" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, styles.totalIcon]}>
+              <Icon name="people-outline" size={20} color="#FEC82B" />
+            </View>
             <Text style={styles.statValue}>{stats.totalUsers}</Text>
             <Text style={styles.statLabel}>Total Users</Text>
           </View>
+          
           <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, styles.adminIcon]}>
+              <Icon name="shield-checkmark-outline" size={20} color="#EF4444" />
+            </View>
             <Text style={[styles.statValue, styles.adminStat]}>{stats.admins}</Text>
             <Text style={styles.statLabel}>Admins</Text>
           </View>
+          
           <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, styles.cashierIcon]}>
+              <Icon name="person-outline" size={20} color="#10B981" />
+            </View>
             <Text style={[styles.statValue, styles.cashierStat]}>{stats.cashiers}</Text>
             <Text style={styles.statLabel}>Cashiers</Text>
           </View>
+          
           <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, styles.activeIcon]}>
+              <Icon name="checkmark-circle-outline" size={20} color="#FEC82B" />
+            </View>
             <Text style={[styles.statValue, styles.activeStat]}>{stats.activeUsers}</Text>
             <Text style={styles.statLabel}>Active</Text>
           </View>
         </View>
 
+        {/* User List Header */}
         <View style={styles.listHeader}>
-          <Text style={styles.listTitle}>User Management</Text>
+          <View style={styles.listHeaderLeft}>
+            <Icon name="people-outline" size={20} color="#FEC82B" />
+            <Text style={styles.listTitle}>User Management</Text>
+          </View>
           <TouchableOpacity style={styles.addUserBtn} onPress={() => setModalVisible(true)}>
-            <Icon name="add" size={24} color="#fec82b" />
+            <Icon name="add" size={20} color="#111827" />
             <Text style={styles.addUserText}>Add User</Text>
           </TouchableOpacity>
         </View>
 
+        {/* User List */}
         <FlatList
           data={users}
           renderItem={renderUserItem}
@@ -256,79 +314,109 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Icon name="people" size={64} color="#75482f" />
+              <View style={styles.emptyIconContainer}>
+                <Icon name="people-outline" size={64} color="#D1D5DB" />
+              </View>
               <Text style={styles.emptyText}>No users found</Text>
+              <Text style={styles.emptySubtext}>Add users to get started</Text>
             </View>
           }
           showsVerticalScrollIndicator={false}
         />
 
+        {/* Add User Modal */}
         <Modal
           visible={modalVisible}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
         >
-          <SafeAreaView style={styles.safeArea}>
+          <SafeAreaView style={styles.modalSafeArea}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add New User</Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <Icon name="close" size={24} color="#75482f" />
+                <View style={styles.modalHeaderLeft}>
+                  <Icon name="person-add-outline" size={24} color="#FEC82B" />
+                  <Text style={styles.modalTitle}>Add New User</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.modalCloseButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Icon name="close" size={24} color="#6B7280" />
                 </TouchableOpacity>
               </View>
               
               <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
-                <Text style={styles.label}>Full Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newUser.fullName}
-                  onChangeText={(text) => setNewUser({ ...newUser, fullName: text })}
-                  placeholder="Enter full name"
-                  placeholderTextColor="#75482f"
-                />
-
-                <Text style={styles.label}>Email *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newUser.email}
-                  onChangeText={(text) => setNewUser({ ...newUser, email: text })}
-                  placeholder="Enter email"
-                  placeholderTextColor="#75482f"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                />
-
-                <Text style={styles.label}>Password *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newUser.password}
-                  onChangeText={(text) => setNewUser({ ...newUser, password: text })}
-                  placeholder="Enter password"
-                  placeholderTextColor="#75482f"
-                  secureTextEntry
-                />
-
-                <Text style={styles.label}>Role *</Text>
-                <View style={styles.roleSelector}>
-                  <TouchableOpacity
-                    style={[styles.roleOption, newUser.role === 'admin' && styles.roleOptionActive]}
-                    onPress={() => setNewUser({ ...newUser, role: 'admin' })}
-                  >
-                    <Text style={[styles.roleOptionText, newUser.role === 'admin' && styles.roleOptionTextActive]}>
-                      Admin
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.roleOption, newUser.role === 'cashier' && styles.roleOptionActive]}
-                    onPress={() => setNewUser({ ...newUser, role: 'cashier' })}
-                  >
-                    <Text style={[styles.roleOptionText, newUser.role === 'cashier' && styles.roleOptionTextActive]}>
-                      Cashier
-                    </Text>
-                  </TouchableOpacity>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Full Name</Text>
+                  <View style={styles.inputWrapper}>
+                    <Icon name="person-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      value={newUser.fullName}
+                      onChangeText={(text) => setNewUser({ ...newUser, fullName: text })}
+                      placeholder="Enter full name"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
                 </View>
 
-                <TouchableOpacity style={styles.submitBtn} onPress={handleAddUser}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Email</Text>
+                  <View style={styles.inputWrapper}>
+                    <Icon name="mail-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      value={newUser.email}
+                      onChangeText={(text) => setNewUser({ ...newUser, email: text })}
+                      placeholder="Enter email"
+                      placeholderTextColor="#9CA3AF"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Password</Text>
+                  <View style={styles.inputWrapper}>
+                    <Icon name="lock-closed-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      value={newUser.password}
+                      onChangeText={(text) => setNewUser({ ...newUser, password: text })}
+                      placeholder="Enter password"
+                      placeholderTextColor="#9CA3AF"
+                      secureTextEntry
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Role</Text>
+                  <View style={styles.roleSelector}>
+                    <TouchableOpacity
+                      style={[styles.roleOption, newUser.role === 'admin' && styles.roleOptionActive]}
+                      onPress={() => setNewUser({ ...newUser, role: 'admin' })}
+                    >
+                      <Icon name="shield-checkmark-outline" size={18} color={newUser.role === 'admin' ? '#111827' : '#6B7280'} />
+                      <Text style={[styles.roleOptionText, newUser.role === 'admin' && styles.roleOptionTextActive]}>
+                        Admin
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.roleOption, newUser.role === 'cashier' && styles.roleOptionActive]}
+                      onPress={() => setNewUser({ ...newUser, role: 'cashier' })}
+                    >
+                      <Icon name="person-outline" size={18} color={newUser.role === 'cashier' ? '#111827' : '#6B7280'} />
+                      <Text style={[styles.roleOptionText, newUser.role === 'cashier' && styles.roleOptionTextActive]}>
+                        Cashier
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <TouchableOpacity style={styles.submitBtn} onPress={handleAddUser} activeOpacity={0.8}>
+                  <Icon name="checkmark-circle" size={20} color="#111827" />
                   <Text style={styles.submitBtnText}>Add User</Text>
                 </TouchableOpacity>
               </ScrollView>
@@ -343,54 +431,106 @@ const AdminDashboardScreen = ({ user, onLogout }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F3F4F6',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F3F4F6',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F3F4F6',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  headerAction: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FEC82B15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FEC82B30',
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     margin: 16,
     borderRadius: 12,
     padding: 16,
-    elevation: 2,
-    shadowColor: '#0e0b05',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   statCard: {
     flex: 1,
     alignItems: 'center',
   },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fec82b',
+  statIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 4,
   },
-  adminStat: {
-    color: '#ff4444',
+  totalIcon: {
+    backgroundColor: '#FEC82B15',
   },
-  cashierStat: {
-    color: '#4caf50',
+  adminIcon: {
+    backgroundColor: '#EF444415',
   },
-  activeStat: {
-    color: '#fec82b',
+  cashierIcon: {
+    backgroundColor: '#10B98115',
+  },
+  activeIcon: {
+    backgroundColor: '#FEC82B15',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 2,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#75482f',
+    fontSize: 11,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  adminStat: {
+    color: '#EF4444',
+  },
+  cashierStat: {
+    color: '#10B981',
+  },
+  activeStat: {
+    color: '#FEC82B',
   },
   listHeader: {
     flexDirection: 'row',
@@ -399,228 +539,318 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12,
   },
+  listHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   listTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0e0b05',
+    fontWeight: '600',
+    color: '#111827',
   },
   addUserBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fec82b20',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: '#FEC82B',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
+    gap: 6,
+    shadowColor: '#FEC82B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   addUserText: {
-    color: '#fec82b',
-    marginLeft: 4,
+    color: '#111827',
+    fontSize: 13,
     fontWeight: '600',
   },
   listContainer: {
-    padding: 16,
-    paddingTop: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   userCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#0e0b05',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#fec82b',
+    elevation: 1,
   },
   userInfo: {
     flexDirection: 'row',
     marginBottom: 12,
   },
   userAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#fec82b',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  adminAvatar: {
+    backgroundColor: '#EF444415',
+  },
+  cashierAvatar: {
+    backgroundColor: '#FEC82B15',
+  },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FEC82B',
   },
   userDetails: {
     flex: 1,
   },
   userName: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0e0b05',
+    fontWeight: '600',
+    color: '#111827',
   },
   userEmail: {
     fontSize: 13,
-    color: '#75482f',
+    color: '#6B7280',
     marginTop: 2,
   },
   userMeta: {
     flexDirection: 'row',
     marginTop: 6,
+    gap: 6,
   },
   roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginRight: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
   },
   adminBadge: {
-    backgroundColor: '#ff444420',
+    backgroundColor: '#EF444415',
   },
   cashierBadge: {
-    backgroundColor: '#4caf5020',
+    backgroundColor: '#10B98115',
   },
   roleText: {
     fontSize: 10,
     fontWeight: '600',
   },
   adminRoleText: {
-    color: '#ff4444',
+    color: '#EF4444',
   },
   cashierRoleText: {
-    color: '#4caf50',
+    color: '#10B981',
   },
   statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
   },
   activeBadge: {
-    backgroundColor: '#4caf5020',
+    backgroundColor: '#10B98115',
   },
   inactiveBadge: {
-    backgroundColor: '#75482f20',
+    backgroundColor: '#F3F4F6',
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  activeDot: {
+    backgroundColor: '#10B981',
+  },
+  inactiveDot: {
+    backgroundColor: '#9CA3AF',
   },
   statusText: {
     fontSize: 10,
     fontWeight: '600',
   },
   activeStatusText: {
-    color: '#4caf50',
+    color: '#10B981',
   },
   inactiveStatusText: {
-    color: '#75482f',
+    color: '#6B7280',
   },
   userActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 4,
   },
   actionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 6,
-    marginHorizontal: 4,
+    gap: 4,
   },
   promoteBtn: {
-    backgroundColor: '#fec82b',
+    backgroundColor: '#FEC82B',
   },
   demoteBtn: {
-    backgroundColor: '#ff8800',
+    backgroundColor: '#F59E0B',
   },
   deactivateBtn: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#EF4444',
   },
   activateBtn: {
-    backgroundColor: '#4caf50',
+    backgroundColor: '#10B981',
   },
   deleteBtn: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#EF4444',
   },
   actionBtnText: {
-    color: '#0e0b05',
-    fontSize: 11,
-    marginLeft: 4,
-    fontWeight: '500',
+    color: '#111827',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  modalSafeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
+    padding: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#F3F4F6',
+  },
+  modalHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0e0b05',
+    fontWeight: '700',
+    color: '#111827',
+  },
+  modalCloseButton: {
+    padding: 4,
   },
   modalForm: {
-    padding: 16,
+    padding: 20,
+  },
+  inputGroup: {
+    marginBottom: 16,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 8,
-    marginTop: 12,
-    color: '#0e0b05',
+    color: '#374151',
+    marginBottom: 6,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    overflow: 'hidden',
+  },
+  inputIcon: {
+    paddingLeft: 12,
   },
   input: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    color: '#0e0b05',
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    fontSize: 15,
+    color: '#111827',
   },
   roleSelector: {
     flexDirection: 'row',
-    marginBottom: 24,
+    gap: 8,
   },
   roleOption: {
     flex: 1,
-    paddingVertical: 12,
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    marginHorizontal: 4,
-    borderRadius: 8,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    gap: 6,
   },
   roleOptionActive: {
-    backgroundColor: '#fec82b',
+    backgroundColor: '#FEC82B',
+    borderColor: '#FEC82B',
   },
   roleOptionText: {
-    color: '#75482f',
+    color: '#6B7280',
+    fontWeight: '500',
+    fontSize: 14,
   },
   roleOptionTextActive: {
-    color: '#0e0b05',
+    color: '#111827',
     fontWeight: '600',
   },
   submitBtn: {
-    backgroundColor: '#fec82b',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: '#FEC82B',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 12,
     marginTop: 16,
     marginBottom: 40,
+    gap: 8,
+    shadowColor: '#FEC82B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitBtnText: {
-    color: '#0e0b05',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#111827',
+    fontSize: 16,
+    fontWeight: '700',
   },
   emptyContainer: {
-    paddingTop: 100,
+    paddingTop: 80,
+    alignItems: 'center',
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#75482f',
-    marginTop: 12,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    marginTop: 8,
   },
 });
 

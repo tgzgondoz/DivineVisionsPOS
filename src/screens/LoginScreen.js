@@ -88,7 +88,7 @@ const LoginScreen = ({ onLogin }) => {
               )}
             </View>
           </View>
-          <Text style={styles.title}>TuckShop</Text>
+          <Text style={styles.title}>Devine Vision College</Text>
           <Text style={styles.subtitle}>Point of Sale System</Text>
         </View>
 
@@ -132,6 +132,37 @@ const LoginScreen = ({ onLogin }) => {
               <Text style={styles.loginButtonText}>Login</Text>
             )}
           </TouchableOpacity>
+
+          {/* Demo Credentials Section */}
+          <View style={styles.demoContainer}>
+            <Text style={styles.demoTitle}>Quick Demo Login</Text>
+            
+            {/* Admin Demo Button */}
+            <TouchableOpacity 
+              style={[styles.demoButton, styles.adminButton]} 
+              onPress={demoAdmin}
+            >
+              <View style={styles.demoRow}>
+                <Icon name="shield-checkmark" size={16} color="#75482f" />
+                <Text style={styles.demoText}>Admin Login</Text>
+              </View>
+              <Text style={styles.demoCredentials}>admin@devinepos.com</Text>
+              <Text style={styles.demoCredentials}>Devine@Admin2026#Secure</Text>
+            </TouchableOpacity>
+
+            {/* Cashier Demo Button */}
+            <TouchableOpacity 
+              style={[styles.demoButton, styles.cashierButton]} 
+              onPress={demoCashier}
+            >
+              <View style={styles.demoRow}>
+                <Icon name="person" size={16} color="#2c6b9e" />
+                <Text style={styles.demoText}>Cashier Login</Text>
+              </View>
+              <Text style={styles.demoCredentials}>cashier@devinepos.com</Text>
+              <Text style={styles.demoCredentials}>Devine@Cashier2026#Strong</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -152,7 +183,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  // New wrapper for the circle with shadow
   logoCircleWrapper: {
     marginBottom: 16,
     shadowColor: '#75482f',
@@ -161,18 +191,16 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  // The circular container with border
   logoCircle: {
     width: 140,
     height: 140,
     borderRadius: 70,
     borderWidth: 4,
-    borderColor: '#fec82b', // Gold/yellow border matching your brand
+    borderColor: '#fec82b',
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    // Optional: Add inner glow effect
   },
   logo: {
     width: 100,
@@ -252,29 +280,39 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#75482f',
     marginBottom: 12,
+    textAlign: 'center',
   },
   demoButton: {
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginBottom: 10,
-    backgroundColor: '#f8f8f8',
     borderRadius: 8,
-    paddingHorizontal: 12,
+    borderWidth: 1,
+  },
+  adminButton: {
+    backgroundColor: '#fef9f0',
+    borderColor: '#fec82b',
+  },
+  cashierButton: {
+    backgroundColor: '#f0f7ff',
+    borderColor: '#2c6b9e',
   },
   demoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     marginBottom: 4,
   },
   demoText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#0e0b05',
-    fontWeight: '500',
+    fontWeight: '600',
+    marginLeft: 6,
   },
-  demoPassword: {
-    fontSize: 11,
-    color: '#75482f',
+  demoCredentials: {
+    fontSize: 12,
+    color: '#666',
     marginLeft: 22,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
 });
 
