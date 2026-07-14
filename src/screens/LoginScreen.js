@@ -10,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthService from '../services/AuthService';
@@ -21,14 +23,29 @@ const LoginScreen = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateEmail = (text) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (text && !emailRegex.test(text)) {
+      setEmailError('Please enter a valid email');
+    } else {
+      setEmailError('');
+    }
+    setEmail(text);
+  };
 
   const handleLogin = async () => {
+    setEmailError('');
+    setPasswordError('');
+
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter email');
+      setEmailError('Email is required');
       return;
     }
     if (!password.trim()) {
-      Alert.alert('Error', 'Please enter password');
+      setPasswordError('Password is required');
       return;
     }
 
@@ -57,85 +74,100 @@ const LoginScreen = ({ onLogin }) => {
   const demoAdmin = () => {
     setEmail('admin@devinepos.com');
     setPassword('Devine@Admin2026#Secure');
+    setEmailError('');
+    setPasswordError('');
   };
 
   const demoCashier = () => {
     setEmail('cashier@devinepos.com');
     setPassword('Devine@Cashier2026#Strong');
+    setEmailError('');
+    setPasswordError('');
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.logoContainer}>
-          {/* Circular border wrapper */}
-          <View style={styles.logoCircleWrapper}>
-            <View style={styles.logoCircle}>
-              {!imageError ? (
-                <Image 
-                  source={require('../../assets/logo.png')} 
-                  style={styles.logo}
-                  resizeMode="contain"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <View style={[styles.logo, styles.fallbackLogo]}>
-                  <Icon name="storefront" size={60} color="#fec82b" />
-                </View>
-              )}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.logoContainer}>
+            {/* Circular border container */}
+            <View style={styles.logoCircleWrapper}>
+              <View style={styles.logoCircle}>
+                {!imageError ? (
+                  <Image 
+                    source={require('../../assets/logo.png')} 
+                    style={styles.logo}
+                    resizeMode="contain"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <View style={[styles.logo, styles.fallbackLogo]}>
+                    <Icon name="storefront" size={60} color="#fec82b" />
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
-          <Text style={styles.title}>Devine Vision College</Text>
-          <Text style={styles.subtitle}>Point of Sale System</Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Icon name="mail" size={20} color="#75482f" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
+            <Text style={styles.title}>Devine Vision College</Text>
+            <Text style={styles.subtitle}>Point of Sale System</Text>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Icon name="lock-closed" size={20} color="#75482f" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-              <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#75482f" />
+          <View style={styles.formContainer}>
+            <View style={styles.inputWrapper}>
+              <View style={[styles.inputContainer, emailError && styles.inputError]}>
+                <Icon name="mail" size={20} color="#75482f" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={validateEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+              {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            </View>
+
+            <View style={styles.inputWrapper}>
+              <View style={[styles.inputContainer, passwordError && styles.inputError]}>
+                <Icon name="lock-closed" size={20} color="#75482f" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                  <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#75482f" />
+                </TouchableOpacity>
+              </View>
+              {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator color="#0e0b05" />
+                  <Text style={styles.loadingText}>Logging in...</Text>
+                </View>
+              ) : (
+                <Text style={styles.loginButtonText}>Login</Text>
+              )}
             </TouchableOpacity>
-          </View>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#0e0b05" />
-            ) : (
-              <Text style={styles.loginButtonText}>Login</Text>
-            )}
-          </TouchableOpacity>
-         
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -205,15 +237,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  inputWrapper: {
+    marginBottom: 16,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#75482f',
     borderRadius: 8,
-    marginBottom: 16,
     paddingHorizontal: 12,
     backgroundColor: '#fff',
+  },
+  inputError: {
+    borderColor: '#dc3545',
   },
   inputIcon: {
     marginRight: 8,
@@ -227,12 +264,32 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 8,
   },
+  errorText: {
+    color: '#dc3545',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
   loginButton: {
     backgroundColor: '#fec82b',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
+  },
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    color: '#0e0b05',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   loginButtonText: {
     color: '#0e0b05',

@@ -18,7 +18,7 @@ const RestrictedScreen = ({ navigation, screenName }) => {
         {/* Lock Icon with Animation Effect */}
         <View style={styles.iconContainer}>
           <View style={styles.iconBackground}>
-            <Icon name="lock-closed" size={64} color="#FEC82B" />
+            <Icon name="lock-closed" size={64} color="#b90d0b" />
           </View>
           <View style={styles.iconRing} />
           <View style={[styles.iconRing, styles.iconRing2]} />
@@ -27,9 +27,12 @@ const RestrictedScreen = ({ navigation, screenName }) => {
         {/* Title and Message */}
         <View style={styles.content}>
           <Text style={styles.title}>Access Restricted</Text>
-         
+          <Text style={styles.subtitle}>🔒 Administrator Only</Text>
           <View style={styles.divider} />
-          
+          <Text style={styles.message}>
+            The <Text style={styles.highlight}>{screenName}</Text> section is only 
+            available for users with <Text style={styles.highlight}>Administrator</Text> privileges.
+          </Text>
         </View>
 
         {/* Action Buttons */}
@@ -39,7 +42,7 @@ const RestrictedScreen = ({ navigation, screenName }) => {
             onPress={() => navigation.navigate('POS')}
             activeOpacity={0.8}
           >
-            <Icon name="cart-outline" size={20} color="#111827" />
+            <Icon name="cart-outline" size={20} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>Go to POS</Text>
           </TouchableOpacity>
 
@@ -84,11 +87,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#FEC82B15',
+    backgroundColor: '#b90d0b15',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FEC82B30',
+    borderColor: '#b90d0b30',
   },
   iconRing: {
     position: 'absolute',
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 70,
     borderWidth: 2,
-    borderColor: '#FEC82B20',
+    borderColor: '#b90d0b20',
     top: -10,
     left: -10,
   },
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 80,
     borderWidth: 1,
-    borderColor: '#FEC82B10',
+    borderColor: '#b90d0b10',
     top: -20,
     left: -20,
   },
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
   divider: {
     width: 60,
     height: 3,
-    backgroundColor: '#FEC82B',
+    backgroundColor: '#b90d0b',
     borderRadius: 2,
     marginBottom: 16,
   },
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
-    color: '#B90D0B',
+    color: '#b90d0b',
   },
   buttonContainer: {
     width: '100%',
@@ -158,15 +161,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   primaryButton: {
-    backgroundColor: '#FEC82B',
-    shadowColor: '#FEC82B',
+    backgroundColor: '#b90d0b',
+    shadowColor: '#b90d0b',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   primaryButtonText: {
-    color: '#111827',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
