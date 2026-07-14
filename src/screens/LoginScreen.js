@@ -132,37 +132,7 @@ const LoginScreen = ({ onLogin }) => {
               <Text style={styles.loginButtonText}>Login</Text>
             )}
           </TouchableOpacity>
-
-          {/* Demo Credentials Section */}
-          <View style={styles.demoContainer}>
-            <Text style={styles.demoTitle}>Quick Demo Login</Text>
-            
-            {/* Admin Demo Button */}
-            <TouchableOpacity 
-              style={[styles.demoButton, styles.adminButton]} 
-              onPress={demoAdmin}
-            >
-              <View style={styles.demoRow}>
-                <Icon name="shield-checkmark" size={16} color="#75482f" />
-                <Text style={styles.demoText}>Admin Login</Text>
-              </View>
-              <Text style={styles.demoCredentials}>admin@devinepos.com</Text>
-              <Text style={styles.demoCredentials}>Devine@Admin2026#Secure</Text>
-            </TouchableOpacity>
-
-            {/* Cashier Demo Button */}
-            <TouchableOpacity 
-              style={[styles.demoButton, styles.cashierButton]} 
-              onPress={demoCashier}
-            >
-              <View style={styles.demoRow}>
-                <Icon name="person" size={16} color="#2c6b9e" />
-                <Text style={styles.demoText}>Cashier Login</Text>
-              </View>
-              <Text style={styles.demoCredentials}>cashier@devinepos.com</Text>
-              <Text style={styles.demoCredentials}>Devine@Cashier2026#Strong</Text>
-            </TouchableOpacity>
-          </View>
+         
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
