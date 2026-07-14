@@ -386,138 +386,157 @@ const ProductManagementScreen = () => {
     );
   }
 
+  // Render the fixed header content
+  const renderFixedHeader = () => (
+    <View style={styles.fixedHeaderContainer}>
+      {/* Stats Cards */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={styles.statsScroll}
+        contentContainerStyle={styles.statsScrollContent}
+      >
+        <View style={styles.statCard}>
+          <View style={[styles.statIconContainer, styles.primaryIcon]}>
+            <Icon name="cube-outline" size={18} color="#FEC82B" />
+          </View>
+          <Text style={styles.statValue}>{stats.totalProducts}</Text>
+          <Text style={styles.statLabel}>Products</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <View style={[styles.statIconContainer, styles.successIcon]}>
+            <Icon name="cash-outline" size={18} color="#10B981" />
+          </View>
+          <Text style={[styles.statValue, styles.successText]}>
+            {formatCurrency(stats.totalInventoryValue)}
+          </Text>
+          <Text style={styles.statLabel}>Inventory Value</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <View style={[styles.statIconContainer, styles.successIcon]}>
+            <Icon name="trending-up" size={18} color="#10B981" />
+          </View>
+          <Text style={[styles.statValue, styles.successText]}>
+            {formatCurrency(stats.totalPotentialProfit)}
+          </Text>
+          <Text style={styles.statLabel}>Potential Profit</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <View style={[styles.statIconContainer, styles.warningIcon]}>
+            <Icon name="alert-circle-outline" size={18} color="#F59E0B" />
+          </View>
+          <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
+          <Text style={styles.statLabel}>Low Stock</Text>
+        </View>
+        
+        <View style={styles.statCard}>
+          <View style={[styles.statIconContainer, styles.dangerIcon]}>
+            <Icon name="close-circle-outline" size={18} color="#EF4444" />
+          </View>
+          <Text style={[styles.statValue, styles.dangerText]}>{stats.outOfStockCount}</Text>
+          <Text style={styles.statLabel}>Out of Stock</Text>
+        </View>
+      </ScrollView>
+
+      {/* Search and Filters */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Icon name="search-outline" size={20} color="#6B7280" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search products..."
+            placeholderTextColor="#6B7280"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Icon name="close-circle" size={20} color="#6B7280" />
+            </TouchableOpacity>
+          )}
+        </View>
+        
+        <TouchableOpacity 
+          style={styles.filterToggle}
+          onPress={() => setShowFilters(!showFilters)}
+        >
+          <Icon name={showFilters ? "chevron-up-outline" : "options-outline"} size={20} color="#FEC82B" />
+          <Text style={styles.filterToggleText}>Filters & Sort</Text>
+        </TouchableOpacity>
+      </View>
+
+      {showFilters && (
+        <View style={styles.filtersPanel}>
+          <View style={styles.filterSection}>
+            <Icon name="grid-outline" size={16} color="#6B7280" />
+            <Text style={styles.filterTitle}>Categories</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+            {categoriesList.map(category => (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryChip,
+                  selectedCategory === category && styles.categoryChipActive
+                ]}
+                onPress={() => setSelectedCategory(category)}
+              >
+                <Text style={[
+                  styles.categoryChipText,
+                  selectedCategory === category && styles.categoryChipTextActive
+                ]}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <View style={styles.filterSection}>
+            <Icon name="funnel-outline" size={16} color="#6B7280" />
+            <Text style={styles.filterTitle}>Sort By</Text>
+          </View>
+          <View style={styles.sortButtons}>
+            {[
+              { key: 'name', label: 'Name', icon: 'text-outline' },
+              { key: 'sellPrice', label: 'Price', icon: 'cash-outline' },
+              { key: 'buyPrice', label: 'Cost', icon: 'cart-outline' },
+              { key: 'profit', label: 'Profit', icon: 'trending-up-outline' },
+              { key: 'stock', label: 'Stock', icon: 'layers-outline' },
+              { key: 'date', label: 'Date', icon: 'calendar-outline' }
+            ].map((sort) => (
+              <TouchableOpacity
+                key={sort.key}
+                style={[
+                  styles.sortButton,
+                  selectedSort === sort.key && styles.sortButtonActive
+                ]}
+                onPress={() => setSelectedSort(sort.key)}
+              >
+                <Icon name={sort.icon} size={14} color={selectedSort === sort.key ? "#111827" : "#6B7280"} />
+                <Text style={[
+                  styles.sortButtonText,
+                  selectedSort === sort.key && styles.sortButtonTextActive
+                ]}>
+                  {sort.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
       
       <View style={styles.container}>
-     
-        {/* Stats Cards */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statsScroll}>
-          <View style={styles.statsScrollContent}>
-            <View style={styles.statCard}>
-              <View style={[styles.statIconContainer, styles.primaryIcon]}>
-                <Icon name="cube-outline" size={18} color="#FEC82B" />
-              </View>
-              <Text style={styles.statValue}>{stats.totalProducts}</Text>
-              <Text style={styles.statLabel}>Products</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIconContainer, styles.primaryIcon]}>
-                <Icon name="cash-outline" size={18} color="#FEC82B" />
-              </View>
-              <Text style={styles.statValue}>{formatCurrency(stats.totalInventoryValue)}</Text>
-              <Text style={styles.statLabel}>Inventory</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIconContainer, styles.successIcon]}>
-                <Icon name="trending-up" size={18} color="#10B981" />
-              </View>
-              <Text style={[styles.statValue, styles.successText]}>{formatCurrency(stats.totalPotentialProfit)}</Text>
-              <Text style={styles.statLabel}>Profit</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIconContainer, styles.warningIcon]}>
-                <Icon name="alert-circle-outline" size={18} color="#F59E0B" />
-              </View>
-              <Text style={[styles.statValue, styles.warningText]}>{stats.lowStockCount}</Text>
-              <Text style={styles.statLabel}>Low Stock</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIconContainer, styles.dangerIcon]}>
-                <Icon name="close-circle-outline" size={18} color="#EF4444" />
-              </View>
-              <Text style={[styles.statValue, styles.dangerText]}>{stats.outOfStockCount}</Text>
-              <Text style={styles.statLabel}>Out Stock</Text>
-            </View>
-          </View>
-        </ScrollView>
+        {/* Fixed Header Container */}
+        {renderFixedHeader()}
 
-        {/* Search and Filters */}
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
-            <Icon name="search-outline" size={20} color="#6B7280" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search products..."
-              placeholderTextColor="#6B7280"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery !== '' && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Icon name="close-circle" size={20} color="#6B7280" />
-              </TouchableOpacity>
-            )}
-          </View>
-          
-          <TouchableOpacity 
-            style={styles.filterToggle}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <Icon name={showFilters ? "chevron-up-outline" : "options-outline"} size={20} color="#FEC82B" />
-            <Text style={styles.filterToggleText}>Filters & Sort</Text>
-          </TouchableOpacity>
-        </View>
-
-        {showFilters && (
-          <View style={styles.filtersPanel}>
-            <View style={styles.filterSection}>
-              <Icon name="grid-outline" size={16} color="#6B7280" />
-              <Text style={styles.filterTitle}>Categories</Text>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-              {categoriesList.map(category => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.categoryChip,
-                    selectedCategory === category && styles.categoryChipActive
-                  ]}
-                  onPress={() => setSelectedCategory(category)}
-                >
-                  <Text style={[
-                    styles.categoryChipText,
-                    selectedCategory === category && styles.categoryChipTextActive
-                  ]}>{category}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <View style={styles.filterSection}>
-              <Icon name="funnel-outline" size={16} color="#6B7280" />
-              <Text style={styles.filterTitle}>Sort By</Text>
-            </View>
-            <View style={styles.sortButtons}>
-              {[
-                { key: 'name', label: 'Name', icon: 'text-outline' },
-                { key: 'sellPrice', label: 'Price', icon: 'cash-outline' },
-                { key: 'buyPrice', label: 'Cost', icon: 'cart-outline' },
-                { key: 'profit', label: 'Profit', icon: 'trending-up-outline' },
-                { key: 'stock', label: 'Stock', icon: 'layers-outline' },
-                { key: 'date', label: 'Date', icon: 'calendar-outline' }
-              ].map((sort) => (
-                <TouchableOpacity
-                  key={sort.key}
-                  style={[
-                    styles.sortButton,
-                    selectedSort === sort.key && styles.sortButtonActive
-                  ]}
-                  onPress={() => setSelectedSort(sort.key)}
-                >
-                  <Icon name={sort.icon} size={14} color={selectedSort === sort.key ? "#111827" : "#6B7280"} />
-                  <Text style={[
-                    styles.sortButtonText,
-                    selectedSort === sort.key && styles.sortButtonTextActive
-                  ]}>
-                    {sort.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
+        {/* Scrollable Product List */}
         <FlatList
           data={filteredProducts}
           renderItem={renderProduct}
@@ -542,6 +561,7 @@ const ProductManagementScreen = () => {
             </View>
           }
           contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
         />
 
         {/* Add Product FAB */}
@@ -780,6 +800,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F3F4F6',
   },
+  fixedHeaderContainer: {
+    backgroundColor: '#F3F4F6',
+  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -790,36 +813,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 14,
     color: '#6B7280',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  headerAction: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FEC82B15',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FEC82B30',
   },
   statsScroll: {
     backgroundColor: '#FFFFFF',
@@ -878,23 +871,6 @@ const styles = StyleSheet.create({
   },
   dangerText: {
     color: '#EF4444',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FEC82B',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#FEC82B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    zIndex: 100,
   },
   searchContainer: {
     backgroundColor: '#FFFFFF',
@@ -1006,6 +982,23 @@ const styles = StyleSheet.create({
   sortButtonTextActive: {
     color: '#111827',
     fontWeight: '600',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FEC82B',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#FEC82B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    zIndex: 100,
   },
   listContainer: {
     paddingHorizontal: 16,
